@@ -64,7 +64,7 @@ public class DeptServiceImpl implements DeptService {
 	@Override
 	public void addDept(DeptDTO deptDTO) {
 		Sem sem = semDao.findById(deptDTO.getSemId()).orElseThrow(() -> new ResourceNotFoundException("sem","id",deptDTO.getSemId()));
-		;
+		
 		Dept dept = deptDao.findByDeptname(deptDTO.getDeptname());
 		if (dept == null) {
 			dept = new Dept();
