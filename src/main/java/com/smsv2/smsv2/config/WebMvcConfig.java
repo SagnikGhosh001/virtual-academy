@@ -33,8 +33,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //				"/api/sem/addSem/**",
 				"/api/sem/allsembyid/**",
 				"/api/sem/allsembydeptID/**",
-				"/api/student/registerstudent",
-				"/api/admin/registeradmin/{role}"
+				"/api/student/registerstudent"
+//				"/api/admin/registeradmin/{role}"
 				);
 
 	}

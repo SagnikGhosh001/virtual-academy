@@ -21,5 +21,5 @@ public interface AdminService {
 
 	byte[] downloadFile(int studentId);
 
-	void delteAdminById(int id);
+	void delteAdminById(int id,AdminDTO adminDTO);
 }

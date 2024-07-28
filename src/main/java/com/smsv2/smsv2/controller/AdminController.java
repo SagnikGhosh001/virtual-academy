@@ -59,9 +59,9 @@ public class AdminController {
 	}
 
 	@DeleteMapping("/deleteAdminbyId/{id}/{role}")
-	public ResponseEntity<?> deleteStudentbyId(@PathVariable int id, @PathVariable("role") String role) {
+	public ResponseEntity<?> deleteStudentbyId(@PathVariable int id, @PathVariable("role") String role,@RequestBody AdminDTO adminDTO) {
 		if (role.equals("admin")) {
-			this.adminservice.delteAdminById(id);
+			this.adminservice.delteAdminById(id,adminDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);

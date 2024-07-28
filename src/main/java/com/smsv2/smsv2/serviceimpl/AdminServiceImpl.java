@@ -93,12 +93,17 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public void delteAdminById(int id) {
+	public void delteAdminById(int id,AdminDTO adminDTO) {
 		Admin admin=admindao.findById(id)
 				.orElseThrow(()->new ResourceNotFoundException("admin","id",id));
-		admin.getFeedback().forEach(feedback -> feedback.setUser(null));
-		admin.getFeedback().clear();
-		admindao.delete(admin);
+		if(id==adminDTO.getUserid()) {
+			admin.getFeedback().forEach(feedback -> feedback.setUser(null));
+			admin.getFeedback().clear();
+			admindao.delete(admin);
+		}else {
+			throw new ResourceBadRequestException("you are not allowed");
+		}
+		
 
 	}
 
