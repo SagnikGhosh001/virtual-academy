@@ -3,6 +3,6 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:21-slim
-COPY --from=build /target/springrest-0.0.1-SNAPSHOT.jar smsv2.jar
+COPY --from=build /target/smsv2-0.0.1-SNAPSHOT.jar smsv2.jar
 EXPOSE 9091
 ENTRYPOINT [ "java","-jar","smsv2.jar" ]
