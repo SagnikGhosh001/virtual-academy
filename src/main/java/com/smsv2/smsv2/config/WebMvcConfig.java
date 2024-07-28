@@ -25,7 +25,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/api/dept/allDept",
 				"/api/dept/allDeptbyid/**",
 				"/api/dept/allDeptbysemid/**",
-				"/api/updateDept/**",
+				"/api/dept/updateDept/**",
 				"/api/feedback/allfeedback",
 				"/api/feedback/feedbackbyId/**",
 				"/api/sem/allsem",
