@@ -25,15 +25,17 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/api/dept/allDept",
 				"/api/dept/allDeptbyid/**",
 				"/api/dept/allDeptbysemid/**",
-				"/api/dept/updateDept/**",
+//				"/api/dept/updateDept/**",
+//				"/api/dept/addDept/**",
 				"/api/feedback/allfeedback",
 				"/api/feedback/feedbackbyId/**",
 				"/api/sem/allsem",
-				"/api/sem/addSem/**",
-				"/api/dept/addDept/**",
+//				"/api/sem/addSem/**",
 				"/api/sem/allsembyid/**",
 				"/api/sem/allsembydeptID/**",
-				"/api/student/registerstudent");
+				"/api/student/registerstudent",
+				"/api/admin/registeradmin/{role}"
+				);
 
 	}
 
