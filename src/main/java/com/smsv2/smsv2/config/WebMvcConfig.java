@@ -23,15 +23,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/api/user//forgetPassword",
 				"/api/user/sendOtpEmail",
 				"/api/dept/allDept",
-				"/api/dept/allDeptbyid/{id}",
-				"/api/dept/allDeptbysemid/{semId}",
+				"/api/dept/allDeptbyid/**",
+				"/api/dept/allDeptbysemid/**",
 				"/api/feedback/allfeedback",
-				"/api/feedback/feedbackbyId/{id}",
+				"/api/feedback/feedbackbyId/**",
 				"/api/sem/allsem",
-				"/api/sem/addSem/{role}",
-				"/api/dept/addDept/{role}",
-				"/api/sem/allsembyid/{id}",
-				"/api/sem/allsembydeptID/{id}",
+				"/api/sem/addSem/**",
+				"/api/dept/addDept/**",
+				"/api/sem/allsembyid/**",
+				"/api/sem/allsembydeptID/**",
 				"/api/student/registerstudent");
 
 	}
