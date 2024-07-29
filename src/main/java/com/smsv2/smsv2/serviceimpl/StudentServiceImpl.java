@@ -125,10 +125,9 @@ public class StudentServiceImpl implements StudentService {
 		student.setEmailotp(otp);
 		studentemailservice.sendVerficationEmail(studentDTO.getEmail(), otp);
 		String verificationUrl = "https://example.com/verify-email?otp=" + otp;
-	    String verificationMsg = "Thank you for registering!\n\n"
-	            + "Please verify your email to complete the registration process and start using our website.\n"
-	            + "Click the link below to verify:\n"
-	            + verificationUrl;
+		String verificationMsg = "Thank you for registering!\n\n"
+				+ "Please verify your email to complete the registration process and start using our website.\n"
+				+ "Click the link below to verify:\n" + verificationUrl;
 		studentemailservice.sendVerficationEmail1(studentDTO.getEmail(), verificationMsg);
 		studentdao.save(student);
 	}
@@ -137,7 +136,7 @@ public class StudentServiceImpl implements StudentService {
 	public void updateStudent(int id, StudentDTO studentDTO) {
 		Student existStudent = studentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("student", "id", id));
-		if (existStudent.getId() == id) {
+		if (existStudent.getId() == studentDTO.getUserId()) {
 			existStudent.setGender(studentDTO.getGender());
 			existStudent.setName(studentDTO.getName());
 			studentdao.save(existStudent);
@@ -157,7 +156,8 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", studentDTO.getSemId()));
 		Dept dept = deptdao.findById(studentDTO.getDeptId())
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
-		if (teacher.getSem().contains(existStudent.getSem()) && teacher.getDept() == existStudent.getDept()) {
+		if ((teacher.getRole().equals("hod") && teacher.getDept().equals(existStudent.getDept())
+				&& teacher.getSem().contains(existStudent.getSem())) || teacher.getRole().equals("pic")) {
 			existStudent.setRole(studentDTO.getRole());
 			existStudent.setReg(studentDTO.getReg());
 			existStudent.setSem(sem);
@@ -165,38 +165,54 @@ public class StudentServiceImpl implements StudentService {
 			existStudent.setDeptname(dept.getDeptname());
 			existStudent.setSemname(sem.getSemname());
 			studentdao.save(existStudent);
-
-		} else {
-			throw new ResourceBadRequestException("You are not allowed");
+		}else {
+			throw new ResourceBadRequestException("your role is "+teacher.getRole()+" you are not allowed only HOD and PIC is allowed");
 		}
 
 	}
 
 	@Override
-	public void delteStudentById(int id) {
+	public void delteStudentById(int id, StudentDTO studentDTO) {
 		Student existStudent = studentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("student", "id", id));
-		existStudent.getFeedback().forEach(feedback -> feedback.setUser(null));
-		existStudent.getFeedback().clear();
-		studentdao.delete(existStudent);
+		Teacher teacher = teacherdao.findById(studentDTO.getUserId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", studentDTO.getUserId()));
+
+		if ((teacher.getRole().equals("hod") && teacher.getDept().equals(existStudent.getDept())
+				&& teacher.getSem().contains(existStudent.getSem())) || teacher.getRole().equals("pic")) {
+			existStudent.getFeedback().forEach(feedback -> feedback.setUser(null));
+			existStudent.getFeedback().clear();
+			studentdao.delete(existStudent);
+		}else {
+			throw new ResourceBadRequestException("your role is "+teacher.getRole()+" you are not allowed only HOD and PIC is allowed");
+		}
 
 	}
 
 	@Override
-	public void deleteAllStudent() {
-		// Fetch all students from the database
-		List<Student> students = studentdao.findAll();
+	public void deleteAllStudent(StudentDTO studentDTO) {
 
-		// Iterate over each student and perform necessary dissociations
-		for (Student student : students) {
-			// Clear the association between Student and Feedback
-			student.getFeedback().forEach(feedback -> feedback.setUser(null));
-			student.getFeedback().clear();
+		Teacher teacher = teacherdao.findById(studentDTO.getUserId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", studentDTO.getUserId()));
 
+		if (teacher.getRole().equals("pic")) {
+			// Fetch all students from the database
+			List<Student> students = studentdao.findAll();
+
+			// Iterate over each student and perform necessary dissociations
+			for (Student student : students) {
+				// Clear the association between Student and Feedback
+				student.getFeedback().forEach(feedback -> feedback.setUser(null));
+				student.getFeedback().clear();
+
+			}
+
+			// Delete all students from the database
+			studentdao.deleteAll();
+		}  else {
+			throw new ResourceBadRequestException("your are not pic");
 		}
 
-		// Delete all students from the database
-		studentdao.deleteAll();
 	}
 
 	@Override

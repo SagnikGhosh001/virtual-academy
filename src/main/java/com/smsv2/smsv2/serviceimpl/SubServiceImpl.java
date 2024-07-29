@@ -37,7 +37,7 @@ public class SubServiceImpl implements SubService {
 
 	@Autowired
 	private SemDao semDao;
-	
+
 	@Autowired
 	private AdminDao admindao;
 
@@ -50,7 +50,7 @@ public class SubServiceImpl implements SubService {
 	public Optional<Sub> getAllSubById(int id) {
 		Optional<Sub> sub = subdao.findById(id);
 		if (sub.isEmpty()) {
-			throw new ResourceNotFoundException("sub","id",id);
+			throw new ResourceNotFoundException("sub", "id", id);
 		}
 		return sub;
 	}
@@ -70,10 +70,11 @@ public class SubServiceImpl implements SubService {
 	public void addSub(SubDTO subDTO) {
 
 		Dept dept = deptDao.findById(subDTO.getDeptId())
-				.orElseThrow(() -> new ResourceNotFoundException("dept","id",subDTO.getDeptId()));
-		Sem sem = semDao.findById(subDTO.getSemId()).orElseThrow(() -> new ResourceNotFoundException("sem","id",subDTO.getSemId()));
+				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", subDTO.getDeptId()));
+		Sem sem = semDao.findById(subDTO.getSemId())
+				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", subDTO.getSemId()));
 		Teacher teacher = teacherDao.findById(subDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",subDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", subDTO.getTeacherId()));
 		if (sem.getDept().contains(dept)) {
 			if (teacher.getRole().equals("pic")) {
 				Sub sub = new Sub();
@@ -105,12 +106,11 @@ public class SubServiceImpl implements SubService {
 
 	@Override
 	public void updateSub(int id, SubDTO subDTO) {
-		Sub existSub = subdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("sub","id",id));
+		Sub existSub = subdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("sub", "id", id));
 		Teacher teacher = teacherDao.findById(subDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",subDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", subDTO.getTeacherId()));
 		Teacher teacherChange = teacherDao.findById(subDTO.getTeacherChange())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher change","id",subDTO.getTeacherChange()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher change", "id", subDTO.getTeacherChange()));
 		if (teacher.getRole().equals("pic")) {
 			existSub.setSubname(subDTO.getSubname());
 			existSub.setTeacher(teacherChange);
@@ -131,10 +131,9 @@ public class SubServiceImpl implements SubService {
 
 	@Override
 	public void delteSubById(int id, SubDTO subDTO) {
-		Sub existSub = subdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("sub","id",id));
+		Sub existSub = subdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("sub", "id", id));
 		Teacher teacher = teacherDao.findById(subDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",subDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", subDTO.getTeacherId()));
 		if (teacher.getRole().equals("pic")) {
 			subdao.delete(existSub);
 		} else if (teacher.getRole().equals("hod") && teacher.getDept().getId() == existSub.getDept().getId()
@@ -150,8 +149,8 @@ public class SubServiceImpl implements SubService {
 	public void delteSubByDept(int deptId, SubDTO subDTO) {
 		List<Sub> existSub = subdao.findByDeptId(deptId);
 		Teacher teacher = teacherDao.findById(subDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",subDTO.getTeacherId()));
-		if (teacher.getRole().equals("pic") ) {
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", subDTO.getTeacherId()));
+		if (teacher.getRole().equals("pic")) {
 			subdao.deleteAll(existSub);
 		} else if (teacher.getRole().equals("hod") && !existSub.isEmpty()
 				&& teacher.getDept().getId() == existSub.get(0).getDept().getId()) {
@@ -163,8 +162,14 @@ public class SubServiceImpl implements SubService {
 	}
 
 	@Override
-	public void deleteAllSub() {
-		subdao.deleteAll();
+	public void deleteAllSub(SubDTO subDTO) {
+		Teacher teacher = teacherDao.findById(subDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", subDTO.getTeacherId()));
+		if (teacher.getRole().equals("pic")) {
+			subdao.deleteAll();
+		} else {
+			throw new ResourceBadRequestException("you are not pic");
+		}
 
 	}
 

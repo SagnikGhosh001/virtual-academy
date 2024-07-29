@@ -42,7 +42,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 	public Optional<Assignment> getAllAssignmentById(int id) {
 		Optional<Assignment> assignment = assignmentdao.findById(id);
 		if (assignment.isEmpty()) {
-			throw new ResourceNotFoundException("assignment","id",id);
+			throw new ResourceNotFoundException("assignment", "id", id);
 		}
 		return assignment;
 	}
@@ -51,9 +51,9 @@ public class AssignmentServiceImpl implements AssignmentService {
 	public void addAssignment(AssignmentDTO assignmentDTO) {
 
 		Sub sub = subdao.findById(assignmentDTO.getSubId())
-				.orElseThrow(() -> new ResourceNotFoundException("sub","id",assignmentDTO.getSubId()));
+				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", assignmentDTO.getSubId()));
 		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",assignmentDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
 		if (teacher.getSub().contains(sub)) {
 			Assignment assignment = new Assignment();
 			assignment.setName(assignmentDTO.getName());
@@ -75,7 +75,9 @@ public class AssignmentServiceImpl implements AssignmentService {
 	@Override
 	public void updateAssignment(int id, AssignmentDTO assignmentDTO) {
 		Assignment existassignment = assignmentdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("assignment","id",id));
+				.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
+		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
 		if (existassignment.getTeacherId().getId() == assignmentDTO.getTeacherId()) {
 			existassignment.setName(assignmentDTO.getName());
 			existassignment.setDescription(assignmentDTO.getDescription());
@@ -91,7 +93,9 @@ public class AssignmentServiceImpl implements AssignmentService {
 	@Override
 	public void delteAssignmentById(int id, AssignmentDTO assignmentDTO) {
 		Assignment existassignment = assignmentdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("assignment","id",id));
+				.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
+		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
 		if (existassignment.getTeacherId().getId() == assignmentDTO.getTeacherId()) {
 			assignmentdao.delete(existassignment);
 		} else {
@@ -102,8 +106,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 	}
 
 	@Override
-	public void deleteAllAssignment() {
-		assignmentdao.deleteAll();
+	public void deleteAllAssignment(AssignmentDTO assignmentDTO) {
+		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
+		if (teacher.getRole().equals("pic")) {
+			assignmentdao.deleteAll();
+		} else {
+			throw new ResourceBadRequestException("your role should be pic ");
+		}
 
 	}
 
@@ -116,7 +126,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 	@Override
 	public void deleteAllAssignmentBySub(AssignmentDTO assignmentDTO) {
 		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",assignmentDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
 		if (teacher.getSub().stream().anyMatch(s -> s.getId() == assignmentDTO.getSubId())) {
 			List<Assignment> assignment = assignmentdao.findBySubId(assignmentDTO.getSubId());
 			if (!assignment.isEmpty()) {
@@ -136,7 +146,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 	public String uploadFile(int id, MultipartFile file) {
 		try {
 			Assignment assignment = assignmentdao.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("assignment","id",id));
+					.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
 			assignment.setPdf(file.getBytes()); // Assuming 'pdf' field can hold PDF bytes
 			assignmentdao.save(assignment);
 			return "File uploaded successfully";
@@ -148,7 +158,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 	@Override
 	public byte[] downloadFile(int id) {
 		Assignment assignment = assignmentdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("assignment","id",id));
+				.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
 		return assignment.getPdf();
 	}
 

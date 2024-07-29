@@ -32,41 +32,34 @@ public class AttendenceController {
 	}
 
 	@GetMapping("/getattendencebyid/{id}")
-	public ResponseEntity<?> getAssignmentById(@PathVariable int id) {
+	public ResponseEntity<?> getAssignmentById(@PathVariable("id") int id) {
 		return new ResponseEntity<>(attendenceService.getAllAttendenceById(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/getattendencebysubid/{id}")
-	public ResponseEntity<?> getAssignmentBySubId(@PathVariable int subId) {
+	@GetMapping("/getattendencebysubid/{subid}")
+	public ResponseEntity<?> getAssignmentBySubId(@PathVariable("subid") int subId) {
 		return new ResponseEntity<>(attendenceService.getAllAttendenceBySubId(subId), HttpStatus.OK);
 	}
 
-	@PostMapping("/addattendence/{role}")
-	public ResponseEntity<?> addAttendence(@RequestBody AttendenceDTO attendenceDTO,
-			@PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
+	@PostMapping("/addattendence")
+	public ResponseEntity<?> addAttendence(@RequestBody AttendenceDTO attendenceDTO) {
+
 			this.attendenceService.addAssignment(attendenceDTO);
 			return new ResponseEntity<>(HttpStatus.CREATED);
 
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 
-	@PutMapping("/updateattendence/{id}/{role}")
-	public ResponseEntity<?> updateAttendence(@PathVariable int id, @RequestBody AttendenceDTO attendenceDTO,
-			@PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			this.attendenceService.updateAttendence(id, attendenceDTO);
+	@PutMapping("/updateattendence/{id}")
+	public ResponseEntity<?> updateAttendence(@PathVariable("id") int id, @RequestBody AttendenceDTO attendenceDTO) {
+		this.attendenceService.updateAttendence(id, attendenceDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 
 	@PostMapping("/uploadpdf/{id}/{role}")
-	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable int id,
+	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable("id") int id,
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
 
@@ -79,7 +72,7 @@ public class AttendenceController {
 	}
 
 	@GetMapping("/downloadpdf/{id}")
-	public ResponseEntity<byte[]> downloadPdf(@PathVariable int id) {
+	public ResponseEntity<byte[]> downloadPdf(@PathVariable("id") int id) {
 		byte[] fileData = attendenceService.downloadFile(id);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -89,37 +82,31 @@ public class AttendenceController {
 		return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/deleteattendencebyId/{id}/{role}")
-	public ResponseEntity<?> deleteAttendencebyId(@PathVariable int id, @PathVariable("role") String role,
+	@DeleteMapping("/deleteattendencebyId/{id}")
+	public ResponseEntity<?> deleteAttendencebyId(@PathVariable("id") int id,
 			@RequestBody AttendenceDTO attendenceDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
+
 			this.attendenceService.delteAttendenceById(id, attendenceDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 
-	@DeleteMapping("/deleteattendencebySubId/{role}")
-	public ResponseEntity<?> deleteAttendencebySubId(@PathVariable("role") String role, @RequestBody AttendenceDTO attendenceDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
+	@DeleteMapping("/deleteattendencebySubId")
+	public ResponseEntity<?> deleteAttendencebySubId(@RequestBody AttendenceDTO attendenceDTO) {
+
 			this.attendenceService.deleteAllAttendenceSub(attendenceDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 
-	@DeleteMapping("/deleteAllattendence/{role}")
-	public ResponseEntity<?> deleteAllAttendence(@PathVariable("role") String role) {
-		if (role.equals("pic")) {
-			this.attendenceService.deleteAllAttendence();
+	@DeleteMapping("/deleteAllattendence")
+	public ResponseEntity<?> deleteAllAttendence(AttendenceDTO attendenceDTO) {
+
+			this.attendenceService.deleteAllAttendence(attendenceDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 }

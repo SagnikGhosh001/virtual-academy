@@ -14,9 +14,11 @@ import com.smsv2.smsv2.DTO.DeptDTO;
 import com.smsv2.smsv2.DTO.TeacherDTO;
 import com.smsv2.smsv2.OtpService.EmailService;
 import com.smsv2.smsv2.OtpService.PhoneService;
+import com.smsv2.smsv2.dao.AdminDao;
 import com.smsv2.smsv2.dao.DeptDao;
 import com.smsv2.smsv2.dao.SemDao;
 import com.smsv2.smsv2.dao.TeacherDao;
+import com.smsv2.smsv2.entity.Admin;
 import com.smsv2.smsv2.entity.Dept;
 import com.smsv2.smsv2.entity.Sem;
 import com.smsv2.smsv2.entity.Student;
@@ -31,6 +33,9 @@ public class TeacherServiceImpl implements TeacherService {
 
 	@Autowired
 	private TeacherDao teacherdao;
+
+	@Autowired
+	private AdminDao adminDao;
 
 	@Autowired
 	private SemDao semdao;
@@ -102,23 +107,31 @@ public class TeacherServiceImpl implements TeacherService {
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", teacherDTO.getSemId()));
 		Dept dept = deptdao.findById(teacherDTO.getDeptId())
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", teacherDTO.getDeptId()));
-		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-		Teacher teacher = new Teacher();
-		teacher.setDept(dept);
-		teacher.setDeptname(dept.getDeptname());
-		teacher.getSem().add(sem);
-		teacher.setEmail(teacherDTO.getEmail());
-		teacher.setName(teacherDTO.getName());
-		teacher.setGender(teacherDTO.getGender());
-		teacher.setEmailVerified(true);
-		teacher.setPassword(bcrypt.encode(teacherDTO.getPassword()));
-		String loginUrl = "https://example.com/verify-email";
-		String verificationMsg = "Welcome to our platform!\n\n" + "Your account has been successfully created.\n\n"
-				+ "Please use the following credentials for logging in:\n" + "- Email: " + teacherDTO.getEmail() + "\n"
-				+ "- Password: " + teacherDTO.getPassword() + ".\n\n"
-				+ "To complete your registration, please verify your email by clicking the link below:\n" + loginUrl;
-		teacheremailservice.sendVerficationEmail1(teacherDTO.getEmail(), verificationMsg);
-		teacherdao.save(teacher);
+		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
+		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
+		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
+				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
+			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+			Teacher teacher = new Teacher();
+			teacher.setDept(dept);
+			teacher.setDeptname(dept.getDeptname());
+			teacher.getSem().add(sem);
+			teacher.setEmail(teacherDTO.getEmail());
+			teacher.setName(teacherDTO.getName());
+			teacher.setGender(teacherDTO.getGender());
+			teacher.setEmailVerified(true);
+			teacher.setPassword(bcrypt.encode(teacherDTO.getPassword()));
+			String loginUrl = "https://example.com/verify-email";
+			String verificationMsg = "Welcome to our platform!\n\n" + "Your account has been successfully created.\n\n"
+					+ "Please use the following credentials for logging in:\n" + "- Email: " + teacherDTO.getEmail()
+					+ "\n" + "- Password: " + teacherDTO.getPassword() + ".\n\n"
+					+ "To complete your registration, please verify your email by clicking the link below:\n"
+					+ loginUrl;
+			teacheremailservice.sendVerficationEmail1(teacherDTO.getEmail(), verificationMsg);
+			teacherdao.save(teacher);
+		} else {
+			throw new ResourceBadRequestException("your role should be pic or admin");
+		}
 
 	}
 
@@ -144,26 +157,41 @@ public class TeacherServiceImpl implements TeacherService {
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", teacherDTO.getDeptId()));
 		Sem sem = semdao.findById(teacherDTO.getSemId())
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", teacherDTO.getSemId()));
-		existTeacher.setDept(dept);
-		existTeacher.setDeptname(dept.getDeptname());
-		existTeacher.setRole(teacherDTO.getRole());
-		if (!existTeacher.getSem().contains(sem)) {
-			existTeacher.getSem().add(sem);
+		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
+		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
+		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
+				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
+			existTeacher.setDept(dept);
+			existTeacher.setDeptname(dept.getDeptname());
+			existTeacher.setRole(teacherDTO.getRole());
+			if (!existTeacher.getSem().contains(sem)) {
+				existTeacher.getSem().add(sem);
+			}
+			teacherdao.save(existTeacher);
+		} else {
+			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
-		teacherdao.save(existTeacher);
+
 	}
 
 	@Override
-	public void delteTeacherById(int id) {
+	public void delteTeacherById(int id, TeacherDTO teacherDTO) {
 		Teacher existTeacher = teacherdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", id));
-		existTeacher.getSub().forEach(sub -> sub.setTeacher(null));
-		existTeacher.getSub().clear();
-		existTeacher.getAssignment().forEach(asssignment -> asssignment.setTeacherId(null));
-		existTeacher.getAssignment().clear();
-		existTeacher.getFeedback().forEach(feedback -> feedback.setUser(null));
-		existTeacher.getFeedback().clear();
-		teacherdao.delete(existTeacher);
+		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
+		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
+		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
+				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
+			existTeacher.getSub().forEach(sub -> sub.setTeacher(null));
+			existTeacher.getSub().clear();
+			existTeacher.getAssignment().forEach(asssignment -> asssignment.setTeacherId(null));
+			existTeacher.getAssignment().clear();
+			existTeacher.getFeedback().forEach(feedback -> feedback.setUser(null));
+			existTeacher.getFeedback().clear();
+			teacherdao.delete(existTeacher);
+		} else {
+			throw new ResourceBadRequestException("your role should be pic or admin");
+		}
 
 	}
 
@@ -173,16 +201,23 @@ public class TeacherServiceImpl implements TeacherService {
 
 		Sem sem = semdao.findById(teacherDTO.getSemId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", teacherDTO.getSemId()));
+		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
+		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
+		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
+				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
+			if (teacher.getSem().contains(sem)) {
+				teacher.getSem().remove(sem);
+				sem.getTeacher().remove(teacher);
+			} else {
+				throw new ResourceBadRequestException(
+						"Sem with id " + teacherDTO.getSemId() + " is not associated with Teacher with id " + id);
+			}
 
-		if (teacher.getSem().contains(sem)) {
-			teacher.getSem().remove(sem);
-			sem.getTeacher().remove(teacher);
+			teacherdao.save(teacher);
 		} else {
-			throw new ResourceBadRequestException(
-					"Sem with id " + teacherDTO.getSemId() + " is not associated with Teacher with id " + id);
+			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
 
-		teacherdao.save(teacher);
 	}
 
 	@Override
@@ -192,40 +227,55 @@ public class TeacherServiceImpl implements TeacherService {
 
 		Teacher teacher = teacherdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("teacher", "id", id));
 
-		if (teacher.getDept().equals(dept)) {
-			teacher.setDept(null);
-			dept.getTeacher().remove(teacher);
+		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
+		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
+		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
+				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
+			if (teacher.getDept().equals(dept)) {
+				teacher.setDept(null);
+				dept.getTeacher().remove(teacher);
+			} else {
+				throw new ResourceBadRequestException(
+						"dept with id " + teacherDTO.getDeptId() + " is not associated with Teacher with id " + id);
+			}
+
+			teacherdao.save(teacher);
 		} else {
-			throw new ResourceBadRequestException(
-					"dept with id " + teacherDTO.getDeptId() + " is not associated with Teacher with id " + id);
+			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
 
-		teacherdao.save(teacher);
 	}
 
 	@Override
-	public void deleteAllTeacher() {
+	public void deleteAllTeacher(TeacherDTO teacherDTO) {
 		// Fetch all teachers from the database
 		List<Teacher> teachers = teacherdao.findAll();
+		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
+		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
+		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
+				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
+			// Iterate over each teacher and perform necessary dissociations
+			for (Teacher teacher : teachers) {
+				// Clear the association between Teacher and Sub
+				teacher.getSub().forEach(sub -> sub.setTeacher(null));
+				teacher.getSub().clear();
 
-		// Iterate over each teacher and perform necessary dissociations
-		for (Teacher teacher : teachers) {
-			// Clear the association between Teacher and Sub
-			teacher.getSub().forEach(sub -> sub.setTeacher(null));
-			teacher.getSub().clear();
+				// Clear the association between Teacher and Assignment
+				teacher.getAssignment().forEach(assignment -> assignment.setTeacherId(null));
+				teacher.getAssignment().clear();
 
-			// Clear the association between Teacher and Assignment
-			teacher.getAssignment().forEach(assignment -> assignment.setTeacherId(null));
-			teacher.getAssignment().clear();
+				// Clear the association between Teacher and Feedback
+				teacher.getFeedback().forEach(feedback -> feedback.setUser(null));
+				teacher.getFeedback().clear();
 
-			// Clear the association between Teacher and Feedback
-			teacher.getFeedback().forEach(feedback -> feedback.setUser(null));
-			teacher.getFeedback().clear();
+			}
 
+			// Delete all teachers from the database
+			teacherdao.deleteAll();
+		} else {
+			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
 
-		// Delete all teachers from the database
-		teacherdao.deleteAll();
 	}
 
 	@Override

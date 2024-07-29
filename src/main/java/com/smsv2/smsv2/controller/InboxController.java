@@ -17,84 +17,64 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
-
 @RestController
 @RequestMapping("/api/inbox")
 public class InboxController {
-	
+
 	@Autowired
 	private InboxService inboxService;
-	
+
 	@GetMapping("/allInbox")
 	public ResponseEntity<?> allInbox() {
-		return new ResponseEntity<>(inboxService.getAllInbox(),HttpStatus.OK);
+		return new ResponseEntity<>(inboxService.getAllInbox(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/inboxById/{id}")
-	public ResponseEntity<?> inboxByid(@PathVariable int id) {
-		return new ResponseEntity<>(inboxService.getAllInboxById(id),HttpStatus.OK);
+	public ResponseEntity<?> inboxByid(@PathVariable("id") int id) {
+		return new ResponseEntity<>(inboxService.getAllInboxById(id), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/inboxByStudentReg/{reg}")
-	public ResponseEntity<?> inboxByStudentReg(@PathVariable String reg) {
-		return new ResponseEntity<>(inboxService.getAllinboxByStudentReg(reg),HttpStatus.OK);
+	public ResponseEntity<?> inboxByStudentReg(@PathVariable("reg") String reg) {
+		return new ResponseEntity<>(inboxService.getAllinboxByStudentReg(reg), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/inboxByStudentId/{id}")
-	public ResponseEntity<?> inboxByStudentReg(@PathVariable int id) {
-		return new ResponseEntity<>(inboxService.getAllinboxByStudentId(id),HttpStatus.OK);
+	public ResponseEntity<?> inboxByStudentReg(@PathVariable("id") int id) {
+		return new ResponseEntity<>(inboxService.getAllinboxByStudentId(id), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/inboxByTeacherId/{id}")
-	public ResponseEntity<?> inboxByTeacherid(@PathVariable int id) {
-		return new ResponseEntity<>(inboxService.getAllinboxByTeacherId(id),HttpStatus.OK);
+	public ResponseEntity<?> inboxByTeacherid(@PathVariable("id") int id) {
+		return new ResponseEntity<>(inboxService.getAllinboxByTeacherId(id), HttpStatus.OK);
 	}
-	
-	@PostMapping("/addinbox/{role}")
-	public ResponseEntity<?> addinbox(@RequestBody InboxDTO inboxDTO,@PathVariable("role") String role) {
-		if(role.equals("teacher")||role.equals("hod")||role.equals("pic")) {
-			this.inboxService.addInbox(inboxDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-			
-		}else {
-			return new ResponseEntity<String>("You are not allowed",HttpStatus.BAD_REQUEST);
-			
-		}
+
+	@PostMapping("/addinbox")
+	public ResponseEntity<?> addinbox(@RequestBody InboxDTO inboxDTO) {
+		this.inboxService.addInbox(inboxDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
+
 	}
-	@PutMapping("/updateinbox/{id}/{role}")
-	public ResponseEntity<?> updateinbox(@RequestBody InboxDTO inboxDTO,@PathVariable("role") String role,@PathVariable int id) {
-		if(role.equals("teacher")||role.equals("hod")||role.equals("pic")) {
-			this.inboxService.updateInbox(id, inboxDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-			
-		}else {
-			return new ResponseEntity<String>("You are not allowed",HttpStatus.BAD_REQUEST);
-			
-		}
+
+	@PutMapping("/updateinbox/{id}")
+	public ResponseEntity<?> updateinbox(@RequestBody InboxDTO inboxDTO, @PathVariable("id") int id) {
+		this.inboxService.updateInbox(id, inboxDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
-	@DeleteMapping("/deleteinbox/{id}/{role}")
-	public ResponseEntity<?> deleteinbox(@RequestBody InboxDTO inboxDTO,@PathVariable("role") String role,@PathVariable int id) {
-		if(role.equals("teacher")||role.equals("hod")||role.equals("pic")) {
-			this.inboxService.delteInboxById(id, inboxDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-			
-		}else {
-			return new ResponseEntity<String>("You are not allowed",HttpStatus.BAD_REQUEST);
-			
-		}
+
+	@DeleteMapping("/deleteinbox/{id}")
+	public ResponseEntity<?> deleteinbox(@RequestBody InboxDTO inboxDTO, @PathVariable("id") int id) {
+		this.inboxService.delteInboxById(id, inboxDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
-	
-	@DeleteMapping("/deleteAllinbox/{role}")
-	public ResponseEntity<?> deleteAllinbox(@PathVariable("role") String role) {
-		if(role.equals("pic")) {
-			this.inboxService.deleteAllInbox();
-			return new ResponseEntity<>(HttpStatus.OK);
-			
-		}else {
-			return new ResponseEntity<String>("You are not allowed",HttpStatus.BAD_REQUEST);
-			
-		}
+
+	@DeleteMapping("/deleteAllinbox")
+	public ResponseEntity<?> deleteAllinbox(@RequestBody InboxDTO inboxDTO) {
+		this.inboxService.deleteAllInbox(inboxDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
-	
+
 }

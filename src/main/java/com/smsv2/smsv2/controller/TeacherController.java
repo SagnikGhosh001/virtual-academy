@@ -36,17 +36,17 @@ public class TeacherController {
 	}
 
 	@GetMapping("/teacherById/{id}")
-	public ResponseEntity<?> teacherById(@PathVariable int id) {
+	public ResponseEntity<?> teacherById(@PathVariable("id") int id) {
 		return new ResponseEntity<>(teacherservice.getAllTeacherById(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/teacherBysemId/{id}")
-	public ResponseEntity<?> teacherBySemId(@PathVariable int id) {
+	public ResponseEntity<?> teacherBySemId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(teacherservice.getAllTeacherBySemId(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/teacherBydeptId/{id}")
-	public ResponseEntity<?> teacherByDeptId(@PathVariable int id) {
+	public ResponseEntity<?> teacherByDeptId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(teacherservice.getAllTeacherByDeptId(id), HttpStatus.OK);
 	}
 
@@ -82,15 +82,11 @@ public class TeacherController {
 		return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
 	}
 
-	@PostMapping("/registerTeacher/{role}")
-	public ResponseEntity<?> registerTeacher(@RequestBody TeacherDTO teacherDTO, @PathVariable("role") String role) {
-		if (role.equals("pic") || role.equals("admin")) {
-			this.teacherservice.addTeacher(teacherDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
+	@PostMapping("/registerTeacher")
+	public ResponseEntity<?> registerTeacher(@RequestBody TeacherDTO teacherDTO) {
+		this.teacherservice.addTeacher(teacherDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 
-		}
 	}
 
 	@PutMapping("/updateteacherdetails/{id}")
@@ -99,59 +95,39 @@ public class TeacherController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@PutMapping("/updateteacherOthers/{id}/{role}")
-	public ResponseEntity<?> updateteacherOthers(@PathVariable int id, @RequestBody TeacherDTO teacherDTO,
-			@PathVariable("role") String role) {
-		if (role.equals("pic") || role.equals("admin")) {
-			this.teacherservice.updateTeacherOthers(id, teacherDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-
-		}
+	@PutMapping("/updateteacherOthers/{id}")
+	public ResponseEntity<?> updateteacherOthers(@PathVariable int id, @RequestBody TeacherDTO teacherDTO) {
+		this.teacherservice.updateTeacherOthers(id, teacherDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
-	@DeleteMapping("/deleteteacherbyId/{id}/{role}")
-	public ResponseEntity<?> deleteteacherbyId(@PathVariable int id, @PathVariable("role") String role) {
-		if (role.equals("pic") || role.equals("admin")) {
-			this.teacherservice.delteTeacherById(id);
+	@DeleteMapping("/deleteteacherbyId/{id}")
+	public ResponseEntity<?> deleteteacherbyId(@PathVariable int id,@RequestBody TeacherDTO teacherDTO) {
+			this.teacherservice.delteTeacherById(id,teacherDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-
-		}
+		
 	}
-	
-	@DeleteMapping("/deleteParticularSemOfTeacherbyId/{id}/{role}")
-	public ResponseEntity<?> deleteParticularSemOfTeacherbyId(@PathVariable int id, @PathVariable("role") String role,@RequestBody TeacherDTO teacherDTO) {
-		if (role.equals("pic") || role.equals("admin")) {
+
+	@DeleteMapping("/deleteParticularSemOfTeacherbyId/{id}")
+	public ResponseEntity<?> deleteParticularSemOfTeacherbyId(@PathVariable int id,
+			@RequestBody TeacherDTO teacherDTO) {
 			this.teacherservice.delteTeacherSemById(id, teacherDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-
-		}
+		
 	}
-	
-	@DeleteMapping("/deleteParticularDeptOfTeacherbyId/{id}/{role}")
-	public ResponseEntity<?> deleteParticularDeptOfTeacherbyId(@PathVariable int id, @PathVariable("role") String role,@RequestBody TeacherDTO teacherDTO) {
-		if (role.equals("pic") || role.equals("admin")) {
+
+	@DeleteMapping("/deleteParticularDeptOfTeacherbyId/{id}")
+	public ResponseEntity<?> deleteParticularDeptOfTeacherbyId(@PathVariable int id,
+			@RequestBody TeacherDTO teacherDTO) {
 			this.teacherservice.delteTeacherDeptById(id, teacherDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
 
-		}
 	}
 
-	@DeleteMapping("/deleteAllteacher/{role}")
-	public ResponseEntity<?> deleteAllteacher(@PathVariable("role") String role) {
-		if (role.equals("pic") || role.equals("admin")) {
-			this.teacherservice.deleteAllTeacher();
+	@DeleteMapping("/deleteAllteacher")
+	public ResponseEntity<?> deleteAllteacher(@RequestBody TeacherDTO teacherDTO) {
+			this.teacherservice.deleteAllTeacher(teacherDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-
-		}
+		
 	}
 }

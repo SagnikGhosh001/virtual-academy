@@ -37,17 +37,17 @@ public class AssignmentController {
 	}
 
 	@GetMapping("/assignmnetbyid/{id}")
-	public ResponseEntity<?> getAllAssignment(@PathVariable int id) {
+	public ResponseEntity<?> getAllAssignment(@PathVariable("id") int id) {
 		return new ResponseEntity<>(assignmentservice.getAllAssignmentById(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/assignmnetbysubid/{subid}")
-	public ResponseEntity<?> getAllAssignmentBySubId(@PathVariable int subid) {
+	public ResponseEntity<?> getAllAssignmentBySubId(@PathVariable("subid") int subid) {
 		return new ResponseEntity<>(assignmentservice.getAllAssignmentBySubId(subid), HttpStatus.OK);
 	}
 
 	@PostMapping("/uploadpdf/{id}/{role}")
-	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable int id,
+	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable("id") int id,
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
 			String message = assignmentservice.uploadFile(id, file);
@@ -58,7 +58,7 @@ public class AssignmentController {
 	}
 
 	@GetMapping("/downloadpdf/{id}")
-	public ResponseEntity<byte[]> downloadPdf(@PathVariable int id) {
+	public ResponseEntity<byte[]> downloadPdf(@PathVariable("id") int id) {
 		byte[] fileData = assignmentservice.downloadFile(id);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -68,58 +68,40 @@ public class AssignmentController {
 		return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
 	}
 
-	@PostMapping("/addassignmnet/{role}")
-	public ResponseEntity<?> addAssignment(@RequestBody AssignmentDTO assignmentDTO,
-			@PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
+	@PostMapping("/addassignmnet")
+	public ResponseEntity<?> addAssignment(@RequestBody AssignmentDTO assignmentDTO) {
+	
 			this.assignmentservice.addAssignment(assignmentDTO);
 			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
-
 	}
 
-	@PutMapping("/updateassignment/{id}/{role}")
-	public ResponseEntity<?> updateAssignment(@PathVariable int id, @RequestBody AssignmentDTO assignmentDTO,
-			@PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
+	@PutMapping("/updateassignment/{id}")
+	public ResponseEntity<?> updateAssignment(@PathVariable("id") int id, @RequestBody AssignmentDTO assignmentDTO) {
 			this.assignmentservice.updateAssignment(id, assignmentDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 
-	@DeleteMapping("/deleteassignmentbyId/{id}/{role}")
-	public ResponseEntity<?> deleteAssignmentById(@PathVariable int id, @RequestBody AssignmentDTO assignmentDTO,
-			@PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
+	@DeleteMapping("/deleteassignmentbyId/{id}")
+	public ResponseEntity<?> deleteAssignmentById(@PathVariable("id") int id, @RequestBody AssignmentDTO assignmentDTO) {
 			this.assignmentservice.delteAssignmentById(id, assignmentDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 
-	@DeleteMapping("/deleteAllassignment/{role}")
-	public ResponseEntity<?> deleteAllAssignment(@PathVariable("role") String role) {
-		if (role.equals("pic") ) {
-			this.assignmentservice.deleteAllAssignment();
+	@DeleteMapping("/deleteAllassignment")
+	public ResponseEntity<?> deleteAllAssignment(@RequestBody AssignmentDTO assignmentDTO) {
+		
+			this.assignmentservice.deleteAllAssignment(assignmentDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 	}
 
-	@DeleteMapping("/deleteAllassignmentBySub/{role}")
-	public ResponseEntity<?> deleteAllAssignmentBySub(@PathVariable("role") String role, @RequestBody AssignmentDTO assignmentDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
+	@DeleteMapping("/deleteAllassignmentBySub")
+	public ResponseEntity<?> deleteAllAssignmentBySub(@RequestBody AssignmentDTO assignmentDTO) {
+
 			this.assignmentservice.deleteAllAssignmentBySub(assignmentDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
 	}
 
 }

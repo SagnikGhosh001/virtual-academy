@@ -81,7 +81,7 @@ public class FeedbackSeviceImpl implements FeedbackService {
 	public void deleteFeedbackById(int id,FeedbackDTO feedbackDTO) {
 		Feedback feedback = feedbackdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("feedback","id",id));
 		Optional<Admin> admin=admindao.findByEmail(feedbackDTO.getEmail());
-		if (feedback.getUser().getEmail() == feedbackDTO.getEmail() || admin.isPresent()) {
+		if (feedback.getUser().getEmail() == feedbackDTO.getEmail() || (admin.isPresent()&&admin.get().getRole().equals("admin"))) {
 			feedbackdao.deleteById(id);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed");
@@ -90,8 +90,15 @@ public class FeedbackSeviceImpl implements FeedbackService {
 	}
 
 	@Override
-	public void deleteAllFeedback() {
-		feedbackdao.deleteAll();
+	public void deleteAllFeedback(FeedbackDTO feedbackDTO) {
+		Optional<Admin> admin=admindao.findByEmail(feedbackDTO.getEmail());
+		if(admin.isPresent()&&admin.get().getRole().equals("admin")) {
+			feedbackdao.deleteAll();
+		}else {
+			throw new ResourceBadRequestException("you are not admin");
+			
+		}
+		
 
 	}
 

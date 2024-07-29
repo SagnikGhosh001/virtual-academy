@@ -34,29 +34,35 @@ public class AdminServiceImpl implements AdminService {
 		if (admin.isPresent())
 			return admin;
 		else
-			throw new ResourceNotFoundException("admin","id",id);
+			throw new ResourceNotFoundException("admin", "id", id);
 	}
 
 	@Override
 	public void addAdmin(AdminDTO adminDTO) {
-		Admin admin=new Admin();
-		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-		admin.setEmail(adminDTO.getEmail());
-		admin.setEmailVerified(true);
-		admin.setGender(adminDTO.getGender());
-		admin.setName(adminDTO.getName());
-		admin.setRole("admin");
-		admin.setPassword(bcrypt.encode(adminDTO.getPassword()));
-		admin.setPhone(adminDTO.getPhone());
-		admin.setPhoneverified(true);
-		admindao.save(admin);
+		Admin checkadmin = admindao.findById(adminDTO.getUserid())
+				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
+		if (checkadmin.getRole().equals("admin")) {
+			Admin admin = new Admin();
+			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+			admin.setEmail(adminDTO.getEmail());
+			admin.setEmailVerified(true);
+			admin.setGender(adminDTO.getGender());
+			admin.setName(adminDTO.getName());
+			admin.setRole("admin");
+			admin.setPassword(bcrypt.encode(adminDTO.getPassword()));
+			admin.setPhone(adminDTO.getPhone());
+			admin.setPhoneverified(true);
+			admindao.save(admin);
+		} else {
+			throw new ResourceBadRequestException("you are not admin");
+		}
+
 	}
 
 	@Override
-	public void updateAdmin(int id,AdminDTO adminDTO) {
-		Admin admin=admindao.findById(id)
-				.orElseThrow(()->new ResourceNotFoundException("admin","id",id));
-		if(adminDTO.getUserid()==admin.getId()) {
+	public void updateAdmin(int id, AdminDTO adminDTO) {
+		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
+		if (adminDTO.getUserid() == admin.getId()) {
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 			admin.setEmail(adminDTO.getEmail());
 			admin.setEmailVerified(true);
@@ -66,17 +72,16 @@ public class AdminServiceImpl implements AdminService {
 			admin.setPhone(adminDTO.getPhone());
 			admin.setPhoneverified(true);
 			admindao.save(admin);
-		}else {
+		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
-		
+
 	}
 
 	@Override
 	public String uploadFile(int id, MultipartFile file) {
 		try {
-			Admin admin=admindao.findById(id)
-					.orElseThrow(()->new ResourceNotFoundException("admin","id",id));
+			Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
 			admin.setPic(file.getBytes());
 			admindao.save(admin);
 			return "File uploaded successfully";
@@ -87,23 +92,27 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public byte[] downloadFile(int id) {
-		Admin admin=admindao.findById(id)
-				.orElseThrow(()->new ResourceNotFoundException("admin","id",id));
+		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
 		return admin.getPic();
 	}
 
 	@Override
-	public void delteAdminById(int id,AdminDTO adminDTO) {
-		Admin admin=admindao.findById(id)
-				.orElseThrow(()->new ResourceNotFoundException("admin","id",id));
-		if(id==adminDTO.getUserid()) {
-			admin.getFeedback().forEach(feedback -> feedback.setUser(null));
-			admin.getFeedback().clear();
-			admindao.delete(admin);
-		}else {
+	public void delteAdminById(int id, AdminDTO adminDTO) {
+		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
+		if (id == adminDTO.getUserid()) {
+			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+			if (bcrypt.matches(adminDTO.getPassword(), admin.getPassword())) {
+				admin.getFeedback().forEach(feedback -> feedback.setUser(null));
+				admin.getFeedback().clear();
+				admindao.delete(admin);
+			} else {
+				throw new ResourceBadRequestException("use valid password");
+
+			}
+
+		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
-		
 
 	}
 

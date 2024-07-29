@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.AttendenceDTO;
 import com.smsv2.smsv2.entity.Attendence;
 import com.smsv2.smsv2.entity.Sub;
@@ -33,7 +34,7 @@ public interface AttendenceService {
 	void delteAttendenceById(int id, AttendenceDTO attendenceDTO);
 
 	// delete all attendence
-	void deleteAllAttendence();
+	void deleteAllAttendence(AttendenceDTO attendenceDTO);
 
 	// delete all attendence by sub
 	void deleteAllAttendenceSub(AttendenceDTO attendenceDTO);

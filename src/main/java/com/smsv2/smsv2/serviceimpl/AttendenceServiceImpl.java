@@ -40,7 +40,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 	public Optional<Attendence> getAllAttendenceById(int id) {
 		Optional<Attendence> attendence = attendencedao.findById(id);
 		if (attendence.isEmpty()) {
-			throw new ResourceNotFoundException("attendence","id",id);
+			throw new ResourceNotFoundException("attendence", "id", id);
 		}
 		return attendence;
 	}
@@ -55,7 +55,9 @@ public class AttendenceServiceImpl implements AttendenceService {
 	@Override
 	public void addAssignment(AttendenceDTO attendenceDTO) {
 		Sub sub = subdao.findById(attendenceDTO.getSubId())
-				.orElseThrow(() -> new ResourceNotFoundException("sub","id",attendenceDTO.getSubId()));
+				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", attendenceDTO.getSubId()));
+		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		if (attendenceDTO.getTeacherId() == sub.getTeacher().getId()) {
 			Attendence attendence = new Attendence();
 			attendence.setLink(attendenceDTO.getLink());
@@ -76,45 +78,59 @@ public class AttendenceServiceImpl implements AttendenceService {
 	public void updateAttendence(int id, AttendenceDTO attendenceDTO) {
 
 		Attendence existAttendence = attendencedao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("attendence","id",id));
-		if (existAttendence.getSubid().getTeacher().getId() == attendenceDTO.getTeacherId()) {
-			existAttendence.setName(attendenceDTO.getName());
-			existAttendence.setLink(attendenceDTO.getLink());
-			attendencedao.save(existAttendence);
-		} else {
-			throw new ResourceBadRequestException("you are not allowed");
-		}
+				.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
+		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
+			if (existAttendence.getSubid().getTeacher().getId() == attendenceDTO.getTeacherId()) {
+				existAttendence.setName(attendenceDTO.getName());
+				existAttendence.setLink(attendenceDTO.getLink());
+				attendencedao.save(existAttendence);
+			} else {
+				throw new ResourceBadRequestException("you are not allowed");
+			}
+		
 	}
 
 	@Override
 	public void delteAttendenceById(int id, AttendenceDTO attendenceDTO) {
 		Attendence existAttendence = attendencedao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("attendence","id",id));
-		if (existAttendence.getSubid().getTeacher().getId() == attendenceDTO.getTeacherId()) {
-			attendencedao.delete(existAttendence);
-		} else {
-			throw new ResourceBadRequestException("you are not allowed");
-		}
+				.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
+		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
+			if (existAttendence.getSubid().getTeacher().getId() == attendenceDTO.getTeacherId()) {
+				attendencedao.delete(existAttendence);
+			} else {
+				throw new ResourceBadRequestException("you are not allowed");
+			}
+		
+
 	}
 
 	@Override
-	public void deleteAllAttendence() {
-		attendencedao.deleteAll();
+	public void deleteAllAttendence(AttendenceDTO attendenceDTO) {
+		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
+		if (teacher.getRole().equals("pic")) {
+			attendencedao.deleteAll();
+		} else {
+			throw new ResourceBadRequestException("your role should be pic ");
+		}
 
 	}
 
 	@Override
 	public void deleteAllAttendenceSub(AttendenceDTO attendenceDTO) {
 		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",attendenceDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 
-		if (teacher.getSub().stream().anyMatch(s -> s.getId() == attendenceDTO.getSubId())) {
-			List<Attendence> existAttendence = attendencedao.findBySubid_Id(attendenceDTO.getSubId());
-			attendencedao.deleteAll(existAttendence);
-		} else {
-			throw new ResourceBadRequestException("you are not allowed");
+			if (teacher.getSub().stream().anyMatch(s -> s.getId() == attendenceDTO.getSubId())) {
+				List<Attendence> existAttendence = attendencedao.findBySubid_Id(attendenceDTO.getSubId());
+				attendencedao.deleteAll(existAttendence);
+			} else {
+				throw new ResourceBadRequestException("you are not allowed");
 
-		}
+			}
+		
 
 	}
 
@@ -122,7 +138,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 	public String uploadFile(int id, MultipartFile file) {
 		try {
 			Attendence attendence = attendencedao.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("attendence","id",id));
+					.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
 			attendence.setPdf(file.getBytes()); // Assuming 'pdf' field can hold PDF bytes
 			attendencedao.save(attendence);
 			return "File uploaded successfully";
@@ -134,7 +150,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 	@Override
 	public byte[] downloadFile(int id) {
 		Attendence attendence = attendencedao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("attendence","id",id));
+				.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
 		return attendence.getPdf();
 	}
 

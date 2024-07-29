@@ -38,5 +38,5 @@ public interface AssignmentService {
 	void deleteAllAssignmentBySub(AssignmentDTO assignmentDTO);
 
 	// delete all assignment
-	void deleteAllAssignment();
+	void deleteAllAssignment(AssignmentDTO assignmentDTO);
 }

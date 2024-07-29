@@ -3,6 +3,7 @@ package com.smsv2.smsv2.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.InboxDTO;
 import com.smsv2.smsv2.entity.Inbox;
 import com.smsv2.smsv2.entity.Student;
@@ -34,5 +35,5 @@ public interface InboxService {
 	void delteInboxById(int id, InboxDTO inboxDTO);
 
 	// delete all inbox
-	void deleteAllInbox();
+	void deleteAllInbox(InboxDTO inboxDTO);
 }

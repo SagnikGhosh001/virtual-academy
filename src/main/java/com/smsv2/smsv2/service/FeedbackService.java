@@ -3,6 +3,7 @@ package com.smsv2.smsv2.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.FeedbackDTO;
 import com.smsv2.smsv2.entity.Feedback;
 
@@ -17,5 +18,5 @@ public interface FeedbackService {
 
 	void deleteFeedbackById(int id, FeedbackDTO feedbackDTO);
 
-	void deleteAllFeedback();
+	void deleteAllFeedback(FeedbackDTO feedbackDTO);
 }

@@ -3,6 +3,7 @@ package com.smsv2.smsv2.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.DeptDTO;
 import com.smsv2.smsv2.entity.Dept;
 import com.smsv2.smsv2.entity.Teacher;
@@ -30,8 +31,8 @@ public interface DeptService {
 	void delteDeptSemById(int id, DeptDTO deptDTO);
 
 	// delete a Dept
-	void delteDeptById(int id);
+	void delteDeptById(int id,DeptDTO deptDTO);
 
 	// delete all Dept
-	void deleteAllDept();
+	void deleteAllDept(DeptDTO deptDTO);
 }

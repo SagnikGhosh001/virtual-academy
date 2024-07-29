@@ -55,8 +55,8 @@ public interface StudentService {
 	void updateStudentOthers(int id, StudentDTO student);
 
 	// delete a Student
-	void delteStudentById(int id);
+	void delteStudentById(int id,StudentDTO student);
 
 	// delete all Student
-	void deleteAllStudent();
+	void deleteAllStudent(StudentDTO student);
 }

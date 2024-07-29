@@ -18,6 +18,7 @@ public class BookDTO {
 	
 	private int subId;
 	
-	
+	private int userid;
+
 	
 }

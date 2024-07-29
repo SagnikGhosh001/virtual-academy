@@ -3,6 +3,7 @@ package com.smsv2.smsv2.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.MarksDTO;
 import com.smsv2.smsv2.entity.Marks;
 import com.smsv2.smsv2.entity.Student;
@@ -29,5 +30,5 @@ public interface MarksService {
 	void delteMarksById(int id,MarksDTO marksDTO);
 
 	// delete all inbox
-	void deleteAllMarks();
+	void deleteAllMarks(MarksDTO marksDTO);
 }

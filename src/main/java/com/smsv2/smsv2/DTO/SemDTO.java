@@ -13,5 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SemDTO {
 	private String semname;
-	
+	private int userid;
+
 }

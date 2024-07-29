@@ -38,5 +38,5 @@ public interface TopicService {
 	void delteTopicBySubId(int subId, TopicDTO topicDTO);
 
 	// delete all Topic
-	void deleteAllTopic();
+	void deleteAllTopic(TopicDTO topicDTO);
 }

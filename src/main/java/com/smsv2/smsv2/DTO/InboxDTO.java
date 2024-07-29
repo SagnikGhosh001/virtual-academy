@@ -14,5 +14,5 @@ public class InboxDTO {
 	private String msg;
 	private int teacherId;
 	private String reg;
-	private int user;
+
 }

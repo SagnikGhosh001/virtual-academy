@@ -36,5 +36,5 @@ public interface SubService {
 	void delteSubByDept(int deptid, SubDTO subDTO);
 
 	// delete all Sem
-	void deleteAllSub();
+	void deleteAllSub( SubDTO subDTO);
 }

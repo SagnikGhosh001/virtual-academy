@@ -10,7 +10,8 @@ import lombok.NoArgsConstructor;
 public class DeptDTO {
 	private String deptname;
 	private int semId;
-	
+	private int userid;
+
 
 	
 }

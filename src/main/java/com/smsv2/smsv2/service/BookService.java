@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.BookDTO;
 import com.smsv2.smsv2.entity.Book;
 import com.smsv2.smsv2.entity.Dept;
@@ -32,8 +33,8 @@ public interface BookService {
 	
 
 	// delete a Book
-	void delteBookById(int id);
+	void delteBookById(int id,BookDTO book);
 
 	// delete all Dept
-	void deleteAllBook();
+	void deleteAllBook(BookDTO book);
 }

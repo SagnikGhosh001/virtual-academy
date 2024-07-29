@@ -17,76 +17,53 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
-
 @RestController
 @RequestMapping("/api/marks")
 public class MarksController {
 
 	@Autowired
 	private MarksService marksservice;
-	
+
 	@GetMapping("/allMarks")
 	public ResponseEntity<?> allMarks() {
-		return new ResponseEntity<>(marksservice.getAllMarks(),HttpStatus.OK);
+		return new ResponseEntity<>(marksservice.getAllMarks(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/marksById/{id}")
-	public ResponseEntity<?> marksById(@PathVariable int id) {
-		return new ResponseEntity<>(marksservice.getAllMarksById(id),HttpStatus.OK);
+	public ResponseEntity<?> marksById(@PathVariable("id") int id) {
+		return new ResponseEntity<>(marksservice.getAllMarksById(id), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/marksByReg/{reg}")
-	public ResponseEntity<?> marksByReg(@PathVariable String reg) {
-		return new ResponseEntity<>(marksservice.getAllMarksByReg(reg),HttpStatus.OK);
+	public ResponseEntity<?> marksByReg(@PathVariable("reg") String reg) {
+		return new ResponseEntity<>(marksservice.getAllMarksByReg(reg), HttpStatus.OK);
 	}
-	
-	@PostMapping("/addmarks/{role}")
-	public ResponseEntity<?> addmarks(@RequestBody MarksDTO marksDTO,@PathVariable("role") String role) {
-		if(role.equals("teacher")||role.equals("hod")||role.equals("pic")) {
-			this.marksservice.addMarks(marksDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
 
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-
-		}
+	@PostMapping("/addmarks")
+	public ResponseEntity<?> addmarks(@RequestBody MarksDTO marksDTO) {
+		this.marksservice.addMarks(marksDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
-	
-	@PutMapping("/updatemarks/{id}/{role}")
-	public ResponseEntity<?> updatemarks(@RequestBody MarksDTO marksDTO,@PathVariable("role") String role,@PathVariable int id) {
-		if(role.equals("teacher")||role.equals("hod")||role.equals("pic")) {
-			this.marksservice.updateMarkbyId(id, marksDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
 
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
+	@PutMapping("/updatemarks/{id}")
+	public ResponseEntity<?> updatemarks(@RequestBody MarksDTO marksDTO, @PathVariable int id) {
+		this.marksservice.updateMarkbyId(id, marksDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
-		}
 	}
-	
-	@DeleteMapping("/deletemarks/{id}/{role}")
-	public ResponseEntity<?> deletemarks(@PathVariable("role") String role,@PathVariable int id,@RequestBody MarksDTO marksDTO) {
-		if(role.equals("teacher")||role.equals("hod")||role.equals("pic")) {
-			this.marksservice.delteMarksById(id,marksDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
 
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
+	@DeleteMapping("/deletemarks/{id}")
+	public ResponseEntity<?> deletemarks(@PathVariable int id, @RequestBody MarksDTO marksDTO) {
+		this.marksservice.delteMarksById(id, marksDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
-		}
 	}
-	
-	@DeleteMapping("/deleteAllmarks/{role}")
-	public ResponseEntity<?> deleteAllmarks(@PathVariable("role") String role) {
-		if(role.equals("pic")) {
-			this.marksservice.deleteAllMarks();
-			return new ResponseEntity<>(HttpStatus.OK);
 
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
+	@DeleteMapping("/deleteAllmarks")
+	public ResponseEntity<?> deleteAllmarks(@RequestBody MarksDTO marksDTO) {
+		this.marksservice.deleteAllMarks(marksDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
-		}
 	}
-	
+
 }

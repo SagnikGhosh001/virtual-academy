@@ -22,46 +22,36 @@ public class AdminController {
 
 	@Autowired
 	private AdminService adminservice;
+
 	@GetMapping("/allAdmin")
 	public ResponseEntity<?> allAdmin() {
 		return new ResponseEntity<>(adminservice.getAllAdmin(), HttpStatus.OK);
 	}
 
 	@GetMapping("/adminbyId/{id}")
-	public ResponseEntity<?> adminbyId(@PathVariable int id) {
+	public ResponseEntity<?> adminbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(adminservice.getAllAdminById(id), HttpStatus.OK);
 	}
-	
-	@PostMapping("/registeradmin/{role}")
-	public ResponseEntity<?> registerStudent(@RequestBody AdminDTO adminDTO,@PathVariable("role") String role) {
-		if(role.equals("admin")) {
-			this.adminservice.addAdmin(adminDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		}
-		else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
 
-		}
+	@PostMapping("/registeradmin")
+	public ResponseEntity<?> registerStudent(@RequestBody AdminDTO adminDTO) {
+		this.adminservice.addAdmin(adminDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 
 	}
-	
+
 	@PutMapping("/updateAdmin/{id}")
-	public ResponseEntity<?> updateStudentOthers(@PathVariable int id, @PathVariable("role") String role,
-			@RequestBody AdminDTO adminDTO) {
-		if (role.equals("admin")) {
-			this.adminservice.updateAdmin(id, adminDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
+	public ResponseEntity<?> updateStudentOthers(@PathVariable("id") int id, @RequestBody AdminDTO adminDTO) {
 
-		}
-
+		this.adminservice.updateAdmin(id, adminDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@DeleteMapping("/deleteAdminbyId/{id}/{role}")
-	public ResponseEntity<?> deleteStudentbyId(@PathVariable int id, @PathVariable("role") String role,@RequestBody AdminDTO adminDTO) {
+	public ResponseEntity<?> deleteStudentbyId(@PathVariable int id, @PathVariable("role") String role,
+			@RequestBody AdminDTO adminDTO) {
 		if (role.equals("admin")) {
-			this.adminservice.delteAdminById(id,adminDTO);
+			this.adminservice.delteAdminById(id, adminDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);

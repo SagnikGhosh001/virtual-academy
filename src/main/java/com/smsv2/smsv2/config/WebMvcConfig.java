@@ -17,6 +17,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		registry.addInterceptor(jwtRequestInterceptor)
 		.addPathPatterns("/api/**")
 		.excludePathPatterns(
+//				"/swagger-ui/index.html#",
 				"/api/user/login",
 				"/api/user/verifyEmail",
 				"/api/user/verifyPhone",
@@ -26,11 +27,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
 				"/api/dept/allDeptbyid/**",
 				"/api/dept/allDeptbysemid/**",
 //				"/api/dept/updateDept/**",
-//				"/api/dept/addDept/**",
+//				"/api/dept/addDept",
 				"/api/feedback/allfeedback",
 				"/api/feedback/feedbackbyId/**",
 				"/api/sem/allsem",
-//				"/api/sem/addSem/**",
+//				"/api/sem/addSem",
 				"/api/sem/allsembyid/**",
 				"/api/sem/allsembydeptID/**",
 				"/api/student/registerstudent"

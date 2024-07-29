@@ -40,7 +40,7 @@ public class InboxServiceImpl implements InboxService {
 	public Optional<Inbox> getAllInboxById(int id) {
 		Optional<Inbox> inboxOptional = inboxDao.findById(id);
 		if (inboxOptional.isEmpty()) {
-			throw new ResourceNotFoundException("inbox","id",id);
+			throw new ResourceNotFoundException("inbox", "id", id);
 		}
 		return inboxOptional;
 	}
@@ -50,7 +50,7 @@ public class InboxServiceImpl implements InboxService {
 		return inboxDao.findByStudentReg(reg);
 
 	}
-	
+
 	@Override
 	public List<Inbox> getAllinboxByStudentId(int id) {
 		return inboxDao.findByStudentId(id);
@@ -64,10 +64,11 @@ public class InboxServiceImpl implements InboxService {
 
 	@Override
 	public void addInbox(InboxDTO inboxDTO) {
-		Teacher teacher = teacherDao.findById(inboxDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id",inboxDTO.getTeacherId()));
 		Student student = studentDao.findByReg(inboxDTO.getReg())
-				.orElseThrow(() -> new ResourceNotFoundException("student","reg",inboxDTO.getReg()));
+				.orElseThrow(() -> new ResourceNotFoundException("student", "reg", inboxDTO.getReg()));
+		Teacher teacher = teacherDao.findById(inboxDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", inboxDTO.getTeacherId()));
+
 		Inbox inbox = new Inbox();
 		inbox.setStudent(student);
 		inbox.setTeacher(teacher);
@@ -76,13 +77,15 @@ public class InboxServiceImpl implements InboxService {
 		inbox.setTeacherName(teacher.getName());
 		inbox.setTeacherDept(teacher.getDeptname());
 		inboxDao.save(inbox);
+
 	}
 
 	@Override
 	public void updateInbox(int id, InboxDTO inboxDTO) {
-		Inbox existInbox = inboxDao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("feedback","id",id));
-		if (existInbox.getTeacher().getId() == inboxDTO.getUser()) {
+		Inbox existInbox = inboxDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("feedback", "id", id));
+		Teacher teacher = teacherDao.findById(inboxDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", inboxDTO.getTeacherId()));
+		if (existInbox.getTeacher().getId() == inboxDTO.getTeacherId()) {
 			existInbox.setMsg(inboxDTO.getMsg());
 			inboxDao.save(existInbox);
 		} else {
@@ -93,9 +96,11 @@ public class InboxServiceImpl implements InboxService {
 
 	@Override
 	public void delteInboxById(int id, InboxDTO inboxDTO) {
-		Inbox existInbox = inboxDao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("feedback","id",id));
-		if (existInbox.getTeacher().getId() == inboxDTO.getUser()) {
+		Inbox existInbox = inboxDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("feedback", "id", id));
+		Teacher teacher = teacherDao.findById(inboxDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", inboxDTO.getTeacherId()));
+
+		if (existInbox.getTeacher().getId() == inboxDTO.getTeacherId()) {
 			inboxDao.delete(existInbox);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
@@ -104,8 +109,15 @@ public class InboxServiceImpl implements InboxService {
 	}
 
 	@Override
-	public void deleteAllInbox() {
-		inboxDao.deleteAll();
+	public void deleteAllInbox(InboxDTO inboxDTO) {
+		Teacher teacher = teacherDao.findById(inboxDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", inboxDTO.getTeacherId()));
+
+		if (teacher.getRole().equals("pic")) {
+			inboxDao.deleteAll();
+		} else {
+			throw new ResourceBadRequestException("your role should be pic");
+		}
 
 	}
 

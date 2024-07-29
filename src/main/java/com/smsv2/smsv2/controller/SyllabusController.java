@@ -33,35 +33,26 @@ public class SyllabusController {
 	}
 
 	@GetMapping("/syllabusbyId/{id}")
-	public ResponseEntity<?> syllabusbyId(@PathVariable int id) {
+	public ResponseEntity<?> syllabusbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(syllabusservice.getSyllabusById(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/syllabusbyDeptId/{id}")
-	public ResponseEntity<?> syllabusbyDeptId(@PathVariable int id) {
+	public ResponseEntity<?> syllabusbyDeptId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(syllabusservice.getSyllabusByDeptId(id), HttpStatus.OK);
 	}
 
-	@PostMapping("/addsyllabus/{role}")
-	public ResponseEntity<?> addsyllabus(@PathVariable("role") String role, @RequestBody SyllabusDTO syllabusDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			this.syllabusservice.addSyllabus(syllabusDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PostMapping("/addsyllabus")
+	public ResponseEntity<?> addsyllabus(@RequestBody SyllabusDTO syllabusDTO) {
+		this.syllabusservice.addSyllabus(syllabusDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 
 	}
 
-	@PutMapping("/updatesyllabus/{id}/{role}")
-	public ResponseEntity<?> updatesyllabus(@PathVariable int id, @PathVariable("role") String role,
-			@RequestBody SyllabusDTO syllabusDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			this.syllabusservice.updateSyllabus(id, syllabusDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PutMapping("/updatesyllabus/{id}")
+	public ResponseEntity<?> updatesyllabus(@PathVariable("id") int id, @RequestBody SyllabusDTO syllabusDTO) {
+		this.syllabusservice.updateSyllabus(id, syllabusDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
@@ -89,38 +80,24 @@ public class SyllabusController {
 		return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/deleteSyllabusbyId/{id}/{role}")
-	public ResponseEntity<?> deleteSyllabusbyId(@PathVariable int id, @PathVariable("role") String role,
-			@RequestBody SyllabusDTO syllabusDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
-			this.syllabusservice.deleteSyllabusById(id, syllabusDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@DeleteMapping("/deleteSyllabusbyId/{id}")
+	public ResponseEntity<?> deleteSyllabusbyId(@PathVariable("id") int id, @RequestBody SyllabusDTO syllabusDTO) {
+		this.syllabusservice.deleteSyllabusById(id, syllabusDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
-	@DeleteMapping("/deleteSyllabusbyDeptId/{deptId}/{role}")
-	public ResponseEntity<?> deleteSyllabusbyDeptId(@PathVariable int deptId, @PathVariable("role") String role,
+	@DeleteMapping("/deleteSyllabusbyDeptId/{deptId}")
+	public ResponseEntity<?> deleteSyllabusbyDeptId(@PathVariable("deptId") int deptId,
 			@RequestBody SyllabusDTO syllabusDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
-			this.syllabusservice.deleteSyllabusByDeptId(deptId, syllabusDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		this.syllabusservice.deleteSyllabusByDeptId(deptId, syllabusDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
-	@DeleteMapping("/deleteAllSyllabus/{role}")
-	public ResponseEntity<?> deleteAllSyllabus(@PathVariable("role") String role) {
-		if (role.equals("pic")) {
-			this.syllabusservice.deleteAllSyllabus();
+	@DeleteMapping("/deleteAllSyllabus")
+	public ResponseEntity<?> deleteAllSyllabus(@RequestBody SyllabusDTO syllabusDTO) {
+			this.syllabusservice.deleteAllSyllabus(syllabusDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
-
 	}
 }

@@ -28,5 +28,5 @@ public interface SyllabusService {
 
 	void deleteSyllabusByDeptId(int deptid, SyllabusDTO syllabusDTO);
 
-	void deleteAllSyllabus();
+	void deleteAllSyllabus(SyllabusDTO syllabusDTO);
 }

@@ -31,73 +31,59 @@ public class DeptController {
 	}
 	
 	@GetMapping("/allDeptbyid/{id}")
-	public ResponseEntity<?> allDeptbyId(@PathVariable int id) {
+	public ResponseEntity<?> allDeptbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<> (deptservice.getAllDeptById(id),HttpStatus.OK);
 	}
 	
 	@GetMapping("/allDeptbyteacherid/{teacherId}")
-	public ResponseEntity<?> allDeptbyTeacherId(@PathVariable int teacherId) {
+	public ResponseEntity<?> allDeptbyTeacherId(@PathVariable("teacherId") int teacherId) {
 		return new ResponseEntity<> (deptservice.getAllDeptByTeacherId(teacherId),HttpStatus.OK);
 	}
 	
 	@GetMapping("/allDeptbysemid/{semId}")
-	public ResponseEntity<?> allDeptbySemId(@PathVariable int semId) {
+	public ResponseEntity<?> allDeptbySemId(@PathVariable("semId") int semId) {
 		return new ResponseEntity<> (deptservice.getAllDeptBySemId(semId),HttpStatus.OK);
 	}
 	
-	@PostMapping("/addDept/{role}")
-	public ResponseEntity<?> addDept(@RequestBody DeptDTO deptDTO, @PathVariable("role") String role) {
-		if (role.equals("pic")||role.equals("admin")) {
+	@PostMapping("/addDept")
+	public ResponseEntity<?> addDept(@RequestBody DeptDTO deptDTO) {
+
 			this.deptservice.addDept(deptDTO);
 			return new ResponseEntity<>(HttpStatus.CREATED);
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+
 		
 	}
 
-	@PutMapping("/updateDept/{id}/{role}")
-	public ResponseEntity<?> updateDept(@RequestBody DeptDTO deptDTO, @PathVariable("role") String role,@PathVariable int id) {
-		if (role.equals("pic")||role.equals("admin")) {
+	@PutMapping("/updateDept/{id}")
+	public ResponseEntity<?> updateDept(@RequestBody DeptDTO deptDTO,@PathVariable("id") int id) {
+
 			this.deptservice.updateDept(id, deptDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+			return new ResponseEntity<>(HttpStatus.OK);
 		
 	}
 
 	
-	@DeleteMapping("/deleteDeptbyId/{id}/{role}")
-	public ResponseEntity<?> deleteDeptbyId(@PathVariable("role") String role,@PathVariable int id) {
-		if (role.equals("pic")||role.equals("admin")) {
-			this.deptservice.delteDeptById(id);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
-		
-	}
+	@DeleteMapping("/deleteDeptbyId/{id}")
+	public ResponseEntity<?> deleteDeptbyId(@PathVariable("id") int id,@RequestBody DeptDTO deptDTO) {
 	
-	@DeleteMapping("/deleteParticularSemOfDeptbyId/{id}/{role}")
-	public ResponseEntity<?> deleteParticularSemOfDeptbyId(@PathVariable("role") String role,@PathVariable int id,@RequestBody DeptDTO deptDTO) {
-		if (role.equals("pic")||role.equals("admin")) {
-			this.deptservice.delteDeptSemById(id,deptDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
-		
-	}
-	
-	@DeleteMapping("/deleteAllDept/{role}")
-	public ResponseEntity<?> deleteAllDept(@PathVariable("role") String role) {
-		if (role.equals("pic")||role.equals("admin")) {
-			this.deptservice.deleteAllDept();
+			this.deptservice.delteDeptById(id,deptDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
+		
+	}
+	
+	@DeleteMapping("/deleteParticularSemOfDeptbyId/{id}")
+	public ResponseEntity<?> deleteParticularSemOfDeptbyId(@PathVariable("id") int id,@RequestBody DeptDTO deptDTO) {
+			this.deptservice.delteDeptSemById(id,deptDTO);
+			return new ResponseEntity<>(HttpStatus.OK);
+
+	}
+	
+	@DeleteMapping("/deleteAllDept")
+	public ResponseEntity<?> deleteAllDept(DeptDTO deptDTO) {
+			this.deptservice.deleteAllDept(deptDTO);
+			return new ResponseEntity<>(HttpStatus.OK);
+		
 		
 	}
 }

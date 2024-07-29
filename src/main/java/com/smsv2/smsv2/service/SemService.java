@@ -25,12 +25,12 @@ public interface SemService {
 	void addSem(SemDTO name);
 
 	// update Sem name
-	void updateSem(int id, SemDTO name);
+	void updateSem(int id, SemDTO semDTO);
 
 		
 	// delete a Sem
-	void delteSemById(int id);
+	void delteSemById(int id,SemDTO semDTO);
 
 	// delete all Sem
-	void deleteAllSem();
+	void deleteAllSem(SemDTO semDTO);
 }

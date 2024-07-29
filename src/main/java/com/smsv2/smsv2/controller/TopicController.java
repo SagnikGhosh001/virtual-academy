@@ -42,26 +42,20 @@ public class TopicController {
 		return new ResponseEntity<>(topicService.getAllTopicBySubId(id), HttpStatus.OK);
 	}
 
-	@PostMapping("/addtopic/{role}")
-	public ResponseEntity<?> addTopic(@PathVariable("role") String role, @RequestBody TopicDTO topicDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
+	@PostMapping("/addtopic")
+	public ResponseEntity<?> addTopic( @RequestBody TopicDTO topicDTO) {
 			this.topicService.addTopic(topicDTO);
 			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 
 	}
 
-	@PutMapping("/updatetopic/{id}/{role}")
-	public ResponseEntity<?> udateTopic(@PathVariable int id, @PathVariable("role") String role,
+	@PutMapping("/updatetopic/{id}")
+	public ResponseEntity<?> udateTopic(@PathVariable int id,
 			@RequestBody TopicDTO topicDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
 			this.topicService.updateTopic(id, topicDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 
 	}
 
@@ -88,38 +82,29 @@ public class TopicController {
 		return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/deleteTopicbyId/{id}/{role}")
-	public ResponseEntity<?> deleteTopicbyId(@PathVariable int id, @PathVariable("role") String role,
+	@DeleteMapping("/deleteTopicbyId/{id}")
+	public ResponseEntity<?> deleteTopicbyId(@PathVariable int id,
 			@RequestBody TopicDTO topicDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
 			this.topicService.delteTopicById(id, topicDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 
 	}
 
 	@DeleteMapping("/deleteTopicbySubId/{subId}/{role}")
-	public ResponseEntity<?> deleteTopicbySubId(@PathVariable int subId, @PathVariable("role") String role,
+	public ResponseEntity<?> deleteTopicbySubId(@PathVariable int subId, 
 			@RequestBody TopicDTO topicDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
 			this.topicService.delteTopicBySubId(subId, topicDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 
 	}
 
-	@DeleteMapping("/deleteAllTopic/{role}")
-	public ResponseEntity<?> deleteAllTopicby(@PathVariable("role") String role) {
-		if (role.equals("pic") ) {
-			this.topicService.deleteAllTopic();
+	@DeleteMapping("/deleteAllTopic")
+	public ResponseEntity<?> deleteAllTopicby(@RequestBody TopicDTO topicDTO) {
+			this.topicService.deleteAllTopic(topicDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 
 	}
 

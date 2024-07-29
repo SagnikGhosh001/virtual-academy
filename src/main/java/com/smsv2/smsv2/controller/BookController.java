@@ -33,17 +33,17 @@ public class BookController {
 	}
 
 	@GetMapping("/booksbyId/{id}")
-	public ResponseEntity<?> booksbyId(@PathVariable int id) {
+	public ResponseEntity<?> booksbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(bookservice.getAllBookById(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/booksbySemId/{id}")
-	public ResponseEntity<?> booksbySemId(@PathVariable int id) {
-		return new ResponseEntity<>(bookservice.getAllBookBySubId(id), HttpStatus.OK);
+	@GetMapping("/booksbySemId/{semid}")
+	public ResponseEntity<?> booksbySemId(@PathVariable("semid") int semid) {
+		return new ResponseEntity<>(bookservice.getAllBookBySubId(semid), HttpStatus.OK);
 	}
 
 	@PostMapping("/uploadpdf/{id}/{role}")
-	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable int id,
+	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable("id") int id,
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
 
@@ -56,7 +56,7 @@ public class BookController {
 	}
 
 	@GetMapping("/downloadpdf/{id}")
-	public ResponseEntity<byte[]> downloadPdf(@PathVariable int id) {
+	public ResponseEntity<byte[]> downloadPdf(@PathVariable("id") int id) {
 		byte[] fileData = bookservice.downloadFile(id);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -66,45 +66,32 @@ public class BookController {
 		return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
 	}
 
-	@PostMapping("/addbook/{role}")
-	public ResponseEntity<?> addbook(@RequestBody BookDTO bookDTO, @PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			this.bookservice.addBook(bookDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PostMapping("/addbook")
+	public ResponseEntity<?> addbook(@RequestBody BookDTO bookDTO) {
+
+		this.bookservice.addBook(bookDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 
 	}
 
-	@PutMapping("/updateBook/{id}/{role}")
-	public ResponseEntity<?> updateBook(@PathVariable int id, @RequestBody BookDTO bookDTO,
-			@PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			this.bookservice.updateBook(id, bookDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PutMapping("/updateBook/{id}")
+	public ResponseEntity<?> updateBook(@PathVariable("id") int id, @RequestBody BookDTO bookDTO) {
+		this.bookservice.updateBook(id, bookDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
 
-	@DeleteMapping("/deleteBook/{id}/{role}")
-	public ResponseEntity<?> deleteBook(@PathVariable int id, @PathVariable("role") String role) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
-			this.bookservice.delteBookById(id);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@DeleteMapping("/deleteBook/{id}")
+	public ResponseEntity<?> deleteBook(@PathVariable("id") int id, @RequestBody BookDTO bookDTO) {
+		this.bookservice.delteBookById(id, bookDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
 
-	@DeleteMapping("/deleteAllBook/{role}")
-	public ResponseEntity<?> deleteAllBook(@PathVariable("role") String role) {
-		if (role.equals("pic")) {
-			this.bookservice.deleteAllBook();
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@DeleteMapping("/deleteAllBook")
+	public ResponseEntity<?> deleteAllBook(@RequestBody BookDTO bookDTO) {
+		this.bookservice.deleteAllBook(bookDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
 }

@@ -28,7 +28,7 @@ public class FeedbackController {
 	}
 	
 	@GetMapping("/feedbackbyId/{id}")
-	public ResponseEntity<?> topicbyId(@PathVariable int id) {
+	public ResponseEntity<?> topicbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(feedbackservice.getFeedbackById(id),HttpStatus.OK);
 	}
 	
@@ -40,7 +40,7 @@ public class FeedbackController {
 		
 	}
 	@PutMapping("/updatefeedback/{id}")
-	public ResponseEntity<?> udateTopic(@PathVariable int id,@RequestBody FeedbackDTO feedbackDTO) {
+	public ResponseEntity<?> udateTopic(@PathVariable("id") int id,@RequestBody FeedbackDTO feedbackDTO) {
 			this.feedbackservice.updateFeedback(id, feedbackDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 		
@@ -49,19 +49,16 @@ public class FeedbackController {
 
 	
 	@DeleteMapping("/deleteFeedbackbyId/{id}")
-	public ResponseEntity<?> deleteFeedbackbyId(@PathVariable int id,@RequestBody FeedbackDTO feedbackDTO) {
+	public ResponseEntity<?> deleteFeedbackbyId(@PathVariable("id") int id,@RequestBody FeedbackDTO feedbackDTO) {
 			this.feedbackservice.deleteFeedbackById(id, feedbackDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@DeleteMapping("/deleteAllFeedback/{role}")
-	public ResponseEntity<?> deleteAllFeedback(@PathVariable("role") String role) {
-		if(role.equals("admin")) {
-			this.feedbackservice.deleteAllFeedback();
+	@DeleteMapping("/deleteAllFeedback")
+	public ResponseEntity<?> deleteAllFeedback(@RequestBody FeedbackDTO feedbackDTO) {
+			this.feedbackservice.deleteAllFeedback(feedbackDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
-		}else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 		
 	}
 }

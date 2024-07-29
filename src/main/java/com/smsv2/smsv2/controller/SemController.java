@@ -27,57 +27,47 @@ public class SemController {
 	}
 
 	@GetMapping("/allsembyid/{id}")
-	public ResponseEntity<?> getAllSembyId(@PathVariable int id) {
+	public ResponseEntity<?> getAllSembyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(semService.getAllSemById(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/allsembyteacherID/{id}")
-	public ResponseEntity<?> getAllTeacherId(@PathVariable int id) {
+	@GetMapping("/allsembyteacherID/{teacherid}")
+	public ResponseEntity<?> getAllTeacherId(@PathVariable("teacherid") int id) {
 		return new ResponseEntity<>(semService.getAllSemByTeacherId(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/allsembydeptID/{id}")
-	public ResponseEntity<?> getAllDeptId(@PathVariable int id) {
+	@GetMapping("/allsembydeptID/{deptid}")
+	public ResponseEntity<?> getAllDeptId(@PathVariable("deptid") int id) {
 		return new ResponseEntity<>(semService.getAllSemBydeptId(id), HttpStatus.OK);
 	}
 
-	@PostMapping("/addSem/{role}")
-	public ResponseEntity<?> addSem(@RequestBody SemDTO semDTO, @PathVariable("role") String role) {
-		if (role.equals("pic")||role.equals("admin")) {
-			this.semService.addSem(semDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PostMapping("/addSem")
+	public ResponseEntity<?> addSem(@RequestBody SemDTO semDTO) {
+
+		this.semService.addSem(semDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
+
 	}
 
-	@PutMapping("/updateSemName/{id}/{role}")
-	public ResponseEntity<?> updateSem(@RequestBody SemDTO semDTO, @PathVariable int id, @PathVariable("role") String role) {
-		if (role.equals("pic")||role.equals("admin")) {
-			this.semService.updateSem(id, semDTO);
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.CREATED);
-		}
+	@PutMapping("/updateSemName/{id}")
+	public ResponseEntity<?> updateSem(@RequestBody SemDTO semDTO, @PathVariable("id") int id) {
+		this.semService.updateSem(id, semDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
 
-	@DeleteMapping("/deletesem/{id}/{role}")
-	public ResponseEntity<?> deleteSem(@PathVariable int id, @PathVariable("role") String role) {
-		if (role.equals("pic")||role.equals("admin")) {
-			this.semService.delteSemById(id);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@DeleteMapping("/deletesem/{id}")
+	public ResponseEntity<?> deleteSem(@PathVariable("id") int id, @RequestBody SemDTO semDTO) {
+		this.semService.delteSemById(id, semDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
-	
-	@DeleteMapping("/deleteAllSem/{role}")
-	public ResponseEntity<?> deleteAllSem(@PathVariable("role") String role) {
-		if (role.equals("pic")||role.equals("admin")) {
-			this.semService.deleteAllSem();
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+
+	@DeleteMapping("/deleteAllSem")
+	public ResponseEntity<?> deleteAllSem(@RequestBody SemDTO semDTO) {
+
+		this.semService.deleteAllSem(semDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
 	}
 }

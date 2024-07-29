@@ -14,11 +14,14 @@ import com.smsv2.smsv2.dao.BookDao;
 import com.smsv2.smsv2.dao.DeptDao;
 import com.smsv2.smsv2.dao.SemDao;
 import com.smsv2.smsv2.dao.SubDao;
+import com.smsv2.smsv2.dao.TeacherDao;
 import com.smsv2.smsv2.entity.Attendence;
 import com.smsv2.smsv2.entity.Book;
 import com.smsv2.smsv2.entity.Dept;
 import com.smsv2.smsv2.entity.Sem;
 import com.smsv2.smsv2.entity.Sub;
+import com.smsv2.smsv2.entity.Teacher;
+import com.smsv2.smsv2.exception.ResourceBadRequestException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.BookService;
 
@@ -33,6 +36,8 @@ public class BookServiceImpl implements BookService {
 	private DeptDao deptdao;
 	@Autowired
 	private SubDao subdao;
+	@Autowired
+	private TeacherDao teacherdao;
 
 	@Override
 	public List<Book> getAllBook() {
@@ -57,14 +62,18 @@ public class BookServiceImpl implements BookService {
 	@Override
 	public void addBook(BookDTO bookDTO) {
 		Sub sub = subdao.findById(bookDTO.getSubId()).orElseThrow(() -> new ResourceNotFoundException("sub","id",bookDTO.getSubId()));
-		Book book = new Book();
-		book.setSub(sub);
-		book.setLink(bookDTO.getLink());
-		book.setName(bookDTO.getName());
-		book.setDeptname(sub.getDept().getDeptname());
-		book.setSemname(sub.getSem().getSemname());
-		book.setSubname(sub.getSubname());
-		bookdao.save(book);
+		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", bookDTO.getUserid()));
+			Book book = new Book();
+			book.setSub(sub);
+			book.setLink(bookDTO.getLink());
+			book.setName(bookDTO.getName());
+			book.setDeptname(sub.getDept().getDeptname());
+			book.setSemname(sub.getSem().getSemname());
+			book.setSubname(sub.getSubname());
+			bookdao.save(book);
+		
+		
 
 	}
 
@@ -72,24 +81,38 @@ public class BookServiceImpl implements BookService {
 	public void updateBook(int id, BookDTO bookDTO) {
 		Book existBook = bookdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("book","id",id));
-
-		existBook.setLink(bookDTO.getLink());
-		existBook.setName(bookDTO.getName());
-		bookdao.save(existBook);
+		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", bookDTO.getUserid()));
+			existBook.setLink(bookDTO.getLink());
+			existBook.setName(bookDTO.getName());
+			bookdao.save(existBook);
+		
+		
 
 	}
 
 	@Override
-	public void delteBookById(int id) {
+	public void delteBookById(int id,BookDTO bookDTO) {
 		Book existBook = bookdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("book","id",id));
-		bookdao.delete(existBook);
-
+		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", bookDTO.getUserid()));
+			bookdao.delete(existBook);
+		
+		
+		
 	}
 
 	@Override
-	public void deleteAllBook() {
-		bookdao.deleteAll();
+	public void deleteAllBook(BookDTO bookDTO) {
+		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", bookDTO.getUserid()));
+		if (teacher.getRole().equals("pic") ) {
+			bookdao.deleteAll();
+		}else {
+			throw new ResourceBadRequestException("your role should be teacher or pic or hod");
+		}
+		
 
 	}
 

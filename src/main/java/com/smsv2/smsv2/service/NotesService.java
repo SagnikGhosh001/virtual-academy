@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.NotesDTO;
 import com.smsv2.smsv2.entity.Notes;
 
@@ -25,7 +26,7 @@ public interface NotesService {
 	void updateNotes(int id,NotesDTO notesDTO);
 
 	
-	void deleteNotesByid(int id);
+	void deleteNotesByid(int id,NotesDTO notesDTO);
 	
-	void deleteAllNotes();
+	void deleteAllNotes(NotesDTO notesDTO);
 }

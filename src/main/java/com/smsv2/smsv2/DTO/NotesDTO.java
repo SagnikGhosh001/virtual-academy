@@ -12,5 +12,6 @@ public class NotesDTO {
 	private String link;
 	
 	private int subId;
-	
+	private int userid;
+
 }

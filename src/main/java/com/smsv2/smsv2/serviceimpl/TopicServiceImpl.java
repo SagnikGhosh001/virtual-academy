@@ -41,13 +41,12 @@ public class TopicServiceImpl implements TopicService {
 
 	@Override
 	public Optional<Topic> getAllTopicById(int id) {
-	    Optional<Topic> topic = topicdao.findById(id);
-	    if (topic.isEmpty()) {
-	        throw new ResourceNotFoundException("topic","id", id);
-	    }
-	    return topic;
+		Optional<Topic> topic = topicdao.findById(id);
+		if (topic.isEmpty()) {
+			throw new ResourceNotFoundException("topic", "id", id);
+		}
+		return topic;
 	}
-
 
 	@Override
 	public List<Topic> getAllTopicBySubId(int subId) {
@@ -57,9 +56,9 @@ public class TopicServiceImpl implements TopicService {
 	@Override
 	public void addTopic(TopicDTO topicDTO) {
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id", topicDTO.getTeacherId()));
-		Sub sub=subdao.findById(topicDTO.getSubId())
-				.orElseThrow(() -> new ResourceNotFoundException("sub","id", topicDTO.getSubId()));		
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
+		Sub sub = subdao.findById(topicDTO.getSubId())
+				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", topicDTO.getSubId()));
 		if (teacher.getSub().contains(sub)) {
 			Topic topic = new Topic();
 			topic.setName(topicDTO.getName());
@@ -76,31 +75,26 @@ public class TopicServiceImpl implements TopicService {
 
 	@Override
 	public void updateTopic(int id, TopicDTO topicDTO) {
-		Topic existTopic = topicdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("topic","id", id));
+		Topic existTopic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id", topicDTO.getTeacherId()));
-		
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
+
 		if (teacher.getSub().contains(existTopic.getSub())) {
 			existTopic.setName(topicDTO.getName());
 			existTopic.setLink(topicDTO.getLink());
 			topicdao.save(existTopic);
-			
+
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
 
 	}
 
-	
-
-
 	@Override
 	public void delteTopicById(int id, TopicDTO topicDTO) {
-		Topic existTopic = topicdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("topic","id", id));
+		Topic existTopic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id", topicDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
 
 		if (teacher.getSub().contains(existTopic.getSub())) {
 			topicdao.delete(existTopic);
@@ -114,7 +108,7 @@ public class TopicServiceImpl implements TopicService {
 	public void delteTopicBySubId(int subId, TopicDTO topicDTO) {
 		List<Topic> existTopic = topicdao.findBySubId(subId);
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
-				.orElseThrow(() -> new ResourceNotFoundException("teacher","id", topicDTO.getTeacherId()));
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
 
 		if (teacher.getSub().stream().anyMatch(s -> s.getId() == subId)) {
 			topicdao.deleteAll(existTopic);
@@ -125,16 +119,22 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	@Override
-	public void deleteAllTopic() {
-		topicdao.deleteAll();
+	public void deleteAllTopic(TopicDTO topicDTO) {
+		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
+		if (teacher.getRole().equals("pic")) {
+			topicdao.deleteAll();
+		} else {
+			throw new ResourceBadRequestException("you are not pic");
+		}
+
 	}
 
 	@Override
 	public String uploadFile(int id, MultipartFile file) {
 		try {
-			Topic topic = topicdao.findById(id)
-					.orElseThrow(() -> new ResourceNotFoundException("topic","id", id));
-			topic.setPdf(file.getBytes()); 
+			Topic topic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
+			topic.setPdf(file.getBytes());
 			topicdao.save(topic);
 			return "File uploaded successfully";
 		} catch (IOException e) {
@@ -144,8 +144,7 @@ public class TopicServiceImpl implements TopicService {
 
 	@Override
 	public byte[] downloadFile(int id) {
-		Topic topic = topicdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("topic","id", id));
+		Topic topic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
 		return topic.getPdf();
 	}
 }

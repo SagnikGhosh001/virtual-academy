@@ -52,7 +52,7 @@ public interface TeacherService {
 	byte[] downloadFile(int id);
 
 	// delete a Teacher
-	void delteTeacherById(int id);
+	void delteTeacherById(int id, TeacherDTO teacherDTO);
 
 	// delete a Teacher
 	void delteTeacherSemById(int id, TeacherDTO teacherDTO);
@@ -61,5 +61,5 @@ public interface TeacherService {
 	void delteTeacherDeptById(int id, TeacherDTO teacherDTO);
 
 	// delete all Teacher
-	void deleteAllTeacher();
+	void deleteAllTeacher(TeacherDTO teacherDTO);
 }

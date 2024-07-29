@@ -31,74 +31,59 @@ public class SubController {
 	}
 
 	@GetMapping("/subbyId/{id}")
-	public ResponseEntity<?> subbyId(@PathVariable int id) {
+	public ResponseEntity<?> subbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(subService.getAllSubById(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/subbyteacherId/{id}")
-	public ResponseEntity<?> subbyTeaacherIdId(@PathVariable int id) {
+	public ResponseEntity<?> subbyTeaacherIdId(@PathVariable("id") int id) {
 
 		return new ResponseEntity<>(subService.getAllSubByTeacherId(id), HttpStatus.OK);
 	}
 	
 	@GetMapping("/subbysemdeptId/{semId}/{deptId}")
-	public ResponseEntity<?> subbySemDeptId(@PathVariable int semId,@PathVariable int deptId) {
+	public ResponseEntity<?> subbySemDeptId(@PathVariable("semId") int semId,@PathVariable("deptId") int deptId) {
 
 		return new ResponseEntity<>(subService.getAllSubBysemdeptId(semId,deptId), HttpStatus.OK);
 	}
 
-	@PostMapping("/addsub/{role}")
-	public ResponseEntity<?> addSub(@PathVariable("role") String role,@RequestBody SubDTO subDTO) {
-		if (role.equals("pic")||role.equals("hod")||role.equals("teacher")) {
-			this.subService.addSub(subDTO);
-			return new ResponseEntity<>( HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PostMapping("/addsub")
+	public ResponseEntity<?> addSub(@RequestBody SubDTO subDTO) {
+		this.subService.addSub(subDTO);
+			return new ResponseEntity<>( HttpStatus.CREATED);
+		
 		
 	}
-	@PutMapping("/updateSub/{id}/{role}")
-	public ResponseEntity<?> updateSub(@PathVariable int id,@PathVariable("role") String role,@RequestBody SubDTO subDTO) {
-		if (role.equals("pic")||role.equals("teacher")||role.equals("hod")) {
+	@PutMapping("/updateSub/{id}")
+	public ResponseEntity<?> updateSub(@PathVariable("id") int id,@RequestBody SubDTO subDTO) {
 			this.subService.updateSub(id, subDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 		
 	}
 	
 	
 	
 	
-	@DeleteMapping("/deleteSubbyId/{id}/{role}")
-	public ResponseEntity<?> deleteSubbyId(@PathVariable int id,@PathVariable("role") String role,@RequestBody SubDTO subDTO) {
-		if (role.equals("pic")||role.equals("hod")||role.equals("teacher")) {
+	@DeleteMapping("/deleteSubbyId/{id}")
+	public ResponseEntity<?> deleteSubbyId(@PathVariable("id") int id,@RequestBody SubDTO subDTO) {
 			this.subService.delteSubById(id,subDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 		
 	}
-	@DeleteMapping("/deleteAllSub/{role}")
-	public ResponseEntity<?> deleteAllSub(@PathVariable("role") String role) {
-		if (role.equals("pic")) {
-			this.subService.deleteAllSub();
+	@DeleteMapping("/deleteAllSub")
+	public ResponseEntity<?> deleteAllSub(@RequestBody SubDTO subDTO) {
+			this.subService.deleteAllSub(subDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 		
 	}
-	@DeleteMapping("/deleteAllSubbyDept/{role}")
-	public ResponseEntity<?> deleteAllSubbyDept(@PathVariable("role") String role,@RequestBody int deptId,@RequestBody SubDTO subDTO) {
-		if (role.equals("pic")||role.equals("hod")||role.equals("teacher")) {
+	@DeleteMapping("/deleteAllSubbyDept")
+	public ResponseEntity<?> deleteAllSubbyDept(@RequestBody int deptId,@RequestBody SubDTO subDTO) {
 			this.subService.delteSubByDept(deptId,subDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 		
 	}
 }

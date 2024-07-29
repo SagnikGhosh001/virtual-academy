@@ -33,84 +33,65 @@ public class NotesController {
 	}
 
 	@GetMapping("/notesbyId/{id}")
-	public ResponseEntity<?> notesbyId(@PathVariable int id) {
+	public ResponseEntity<?> notesbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(notesservice.getNotesById(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/notesbySubId/{id}")
-	public ResponseEntity<?> notesbySubId(@PathVariable int id) {
-		return new ResponseEntity<>(notesservice.getNotesBySubId(id), HttpStatus.OK);
+	@GetMapping("/notesbySubId/{subid}")
+	public ResponseEntity<?> notesbySubId(@PathVariable("subid") int subid) {
+		return new ResponseEntity<>(notesservice.getNotesBySubId(subid), HttpStatus.OK);
 	}
 
-	@PostMapping("/addnotes/{role}")
-	public ResponseEntity<?> addNotes(@PathVariable("role") String role, @RequestBody NotesDTO notesDTO) {
-		if (role.equals("admin")) {
-			this.notesservice.addNotes(notesDTO);
-			return new ResponseEntity<>(HttpStatus.CREATED);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PostMapping("/addnotes")
+	public ResponseEntity<?> addNotes(@RequestBody NotesDTO notesDTO) {
+
+		this.notesservice.addNotes(notesDTO);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 
 	}
 
-	@PutMapping("/updateNotesName/{id}/{role}")
-	public ResponseEntity<?> udateNotes(@PathVariable int id, @PathVariable("role") String role,
-			@RequestBody NotesDTO notesDTO) {
-		if (role.equals("admin")) {
-			this.notesservice.updateNotes(id, notesDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	@PutMapping("/updateNotes/{id}")
+	public ResponseEntity<?> udateNotes(@PathVariable("id") int id, @RequestBody NotesDTO notesDTO) {
+		this.notesservice.updateNotes(id, notesDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
-
-
 
 	@PostMapping("/uploadpdf/{id}/{role}")
-    public ResponseEntity<String> uploadPdf(@PathVariable("role") String role,@PathVariable int id, @RequestParam("file") MultipartFile file) {
+	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable int id,
+			@RequestParam("file") MultipartFile file) {
 		if (role.equals("admin")) {
 			String message = notesservice.uploadFile(id, file);
-	        return ResponseEntity.status(HttpStatus.OK).body(message);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
-		
-    }
-
-    @GetMapping("/downloadpdf/{id}")
-    public ResponseEntity<byte[]> downloadPdf(@PathVariable int id) {
-        byte[] fileData = notesservice.downloadFile(id);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF); // Set content type to PDF
-        headers.setContentDispositionFormData("attachment", "attendence_document.pdf"); // Set filename for download
-
-        return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
-    }
-	
-	
-	@DeleteMapping("/deleteNotesbyId/{id}/{role}")
-	public ResponseEntity<?> deleteTopicbyId(@PathVariable int id, @PathVariable("role") String role) {
-		if (role.equals("admin")) {
-			this.notesservice.deleteNotesByid(id);
-			return new ResponseEntity<>(HttpStatus.OK);
+			return ResponseEntity.status(HttpStatus.OK).body(message);
 		} else {
 			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
 		}
 
 	}
 
+	@GetMapping("/downloadpdf/{id}")
+	public ResponseEntity<byte[]> downloadPdf(@PathVariable int id) {
+		byte[] fileData = notesservice.downloadFile(id);
 
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF); // Set content type to PDF
+		headers.setContentDispositionFormData("attachment", "attendence_document.pdf"); // Set filename for download
 
-	@DeleteMapping("/deleteAllNotes/{role}")
-	public ResponseEntity<?> deleteAllTopicby(@PathVariable("role") String role) {
-		if (role.equals("admin")) {
-			this.notesservice.deleteAllNotes();
+		return new ResponseEntity<>(fileData, headers, HttpStatus.OK);
+	}
+
+	@DeleteMapping("/deleteNotesbyId/{id}")
+	public ResponseEntity<?> deleteTopicbyId(@PathVariable("id") int id, @RequestBody NotesDTO notesDTO) {
+		this.notesservice.deleteNotesByid(id, notesDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
+
+	}
+
+	@DeleteMapping("/deleteAllNotes")
+	public ResponseEntity<?> deleteAllTopicby(@RequestBody NotesDTO notesDTO) {
+			this.notesservice.deleteAllNotes(notesDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+		
 
 	}
 }

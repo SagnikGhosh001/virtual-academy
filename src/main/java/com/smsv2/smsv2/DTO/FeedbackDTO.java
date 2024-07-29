@@ -13,5 +13,6 @@ public class FeedbackDTO {
 	private int rating;
 
 	private String email;
+	private int userid;
 
 }

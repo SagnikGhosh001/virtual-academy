@@ -32,32 +32,32 @@ public class StudentController {
 	}
 
 	@GetMapping("/studentbyId/{id}")
-	public ResponseEntity<?> studentbyId(@PathVariable int id) {
+	public ResponseEntity<?> studentbyId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(studentservice.getAllStudentById(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/studentbyDeptId/{id}")
-	public ResponseEntity<?> studentbyDeptId(@PathVariable int id) {
+	public ResponseEntity<?> studentbyDeptId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(studentservice.getAllStudentByDept(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/studentbySemId/{id}")
-	public ResponseEntity<?> studentbySemId(@PathVariable int id) {
+	public ResponseEntity<?> studentbySemId(@PathVariable("id") int id) {
 		return new ResponseEntity<>(studentservice.getAllStudentBySem(id), HttpStatus.OK);
 	}
 
 	@GetMapping("/studentbyEmail/{email}")
-	public ResponseEntity<?> studentbyEmail(@PathVariable String email) {
+	public ResponseEntity<?> studentbyEmail(@PathVariable("email") String email) {
 		return new ResponseEntity<>(studentservice.getAllStudentByEmail(email), HttpStatus.OK);
 	}
 
 	@GetMapping("/studentbyPhone/{phone}")
-	public ResponseEntity<?> studentbyPhone(@PathVariable String phone) {
+	public ResponseEntity<?> studentbyPhone(@PathVariable("phone") String phone) {
 		return new ResponseEntity<>(studentservice.getAllStudentByPhone(phone), HttpStatus.OK);
 	}
 
 	@GetMapping("/studentbyReg/{reg}")
-	public ResponseEntity<?> studentbyReg(@PathVariable String reg) {
+	public ResponseEntity<?> studentbyReg(@PathVariable("reg") String reg) {
 		return new ResponseEntity<>(studentservice.getAllStudentByReg(reg), HttpStatus.OK);
 	}
 
@@ -74,13 +74,13 @@ public class StudentController {
 	}
 
 	@PostMapping("/uploadstudentpic/{studentId}")
-	public ResponseEntity<String> uploadFile(@PathVariable int studentId, @RequestParam("file") MultipartFile file) {
+	public ResponseEntity<String> uploadFile(@PathVariable("studentId") int studentId, @RequestParam("file") MultipartFile file) {
 		String message = studentservice.uploadFile(studentId, file);
 		return ResponseEntity.status(HttpStatus.OK).body(message);
 	}
 
 	@GetMapping("/download/{studentId}")
-	public ResponseEntity<byte[]> downloadFile(@PathVariable int studentId) {
+	public ResponseEntity<byte[]> downloadFile(@PathVariable("studentId") int studentId) {
 		byte[] fileData = studentservice.downloadFile(studentId);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -91,44 +91,30 @@ public class StudentController {
 	}
 
 	@PutMapping("/updateStudentDetails/{id}")
-	public ResponseEntity<?> updateStudentDetails(@PathVariable int id, @RequestBody StudentDTO studentDTO) {
+	public ResponseEntity<?> updateStudentDetails(@PathVariable("id") int id, @RequestBody StudentDTO studentDTO) {
 		this.studentservice.updateStudent(id, studentDTO);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@PutMapping("/updateStudentOthers/{id}")
-	public ResponseEntity<?> updateStudentOthers(@PathVariable int id, @PathVariable("role") String role,
-			@RequestBody StudentDTO studentDTO) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			this.studentservice.updateStudentOthers(id, studentDTO);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-
-		}
+	public ResponseEntity<?> updateStudentOthers(@PathVariable("id") int id, @RequestBody StudentDTO studentDTO) {
+		this.studentservice.updateStudentOthers(id, studentDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
 
-	@DeleteMapping("/deleteStudentbyId/{id}/{role}")
-	public ResponseEntity<?> deleteStudentbyId(@PathVariable int id, @PathVariable("role") String role) {
-		if (role.equals("pic") ) {
-			this.studentservice.delteStudentById(id);
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
+	@DeleteMapping("/deleteStudentbyId/{id}")
+	public ResponseEntity<?> deleteStudentbyId(@PathVariable("id") int id, @RequestBody StudentDTO studentDTO) {
+		this.studentservice.delteStudentById(id, studentDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
-		}
 	}
 
-	@DeleteMapping("/deleteAllStudent/{role}")
-	public ResponseEntity<?> deleteAllStudent(@PathVariable("role") String role) {
+	@DeleteMapping("/deleteAllStudent")
+	public ResponseEntity<?> deleteAllStudent(@RequestBody StudentDTO studentDTO) {
 
-		if (role.equals("pic") ) {
-			this.studentservice.deleteAllStudent();
-			return new ResponseEntity<>(HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
+		this.studentservice.deleteAllStudent(studentDTO);
+		return new ResponseEntity<>(HttpStatus.OK);
 
-		}
 	}
 }

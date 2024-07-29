@@ -128,8 +128,16 @@ public class SyllabusServiceImpl implements SyllabusService {
 	}
 
 	@Override
-	public void deleteAllSyllabus() {
-		syllabusdao.deleteAll();
+	public void deleteAllSyllabus(SyllabusDTO syllabusDTO) {
+		Teacher teacher = teacherdao.findById(syllabusDTO.getTeacherId())
+				.orElseThrow(() -> new ResourceNotFoundException("teacher","id", syllabusDTO.getTeacherId()));
+		
+		if(teacher.getRole().equals("pic")) {
+			syllabusdao.deleteAll();
+		}else {
+			throw new ResourceBadRequestException("you are not pic");
+		}
+		
 
 	}
 	
