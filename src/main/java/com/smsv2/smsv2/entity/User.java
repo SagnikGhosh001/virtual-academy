@@ -1,5 +1,6 @@
 package com.smsv2.smsv2.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +56,10 @@ public class User {
 	// verified
 	private String emailotp;
 	private String phoneotp;
+	private boolean isemailOtpUsed=false;
+	private boolean isPhoneOtpUsed=false;
+    private LocalDateTime expiryDateEmailOtp;
+    private LocalDateTime expiryDatePhoneOtp;
 	private boolean emailVerified = false;
 	private boolean phoneverified = false;
 

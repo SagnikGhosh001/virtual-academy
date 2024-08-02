@@ -41,7 +41,7 @@ public class EmailService {
 
 	public void sendVerficationEmail(String email, String otp) {
 		String subject = "Email verification";
-		String body = "your verification otp is " + otp;
+		String body = "your verification otp is " + otp +"only valid for 10 minutes";
 		sendEmail(email, subject, body);
 	}
 	public void sendVerficationEmail1(String email, String msg) {

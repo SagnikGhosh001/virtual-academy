@@ -1,5 +1,6 @@
 package com.smsv2.smsv2.serviceimpl;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,6 @@ import com.smsv2.smsv2.exception.ResourceBadRequestException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.UserService;
 
-
 @Transactional
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,7 +33,6 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private PhoneService phoneservice;
 
-
 //	@Override
 //	public User login(UserDTO userDTO) {
 //		User user = userdao.findByEmail(userDTO.getEmail())
@@ -46,41 +45,42 @@ public class UserServiceImpl implements UserService {
 //
 //		}
 //	}
-	
+
 	@Autowired
-    private JwtUtil jwtUtil;
+	private JwtUtil jwtUtil;
 
-    public LoginResponse login(UserDTO userDTO) {
-        User user = userdao.findByEmail(userDTO.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
+	public LoginResponse login(UserDTO userDTO) {
+		User user = userdao.findByEmail(userDTO.getEmail())
+				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 
-        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-        if (user != null && user.isEmailVerified() && bcrypt.matches(userDTO.getPassword(), user.getPassword())) {
-            // Generate JWT token
-            String token = jwtUtil.generateToken(user.getEmail());
-            
-            // Return user and token
-            return new LoginResponse(token, user);
-        } else {
-            throw new ResourceBadRequestException("Use valid email and password");
-        }
-    }
+		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+		if (user != null && user.isEmailVerified() && bcrypt.matches(userDTO.getPassword(), user.getPassword())) {
+			// Generate JWT token
+			String token = jwtUtil.generateToken(user.getEmail());
 
-
+			// Return user and token
+			return new LoginResponse(token, user);
+		} else {
+			throw new ResourceBadRequestException("Use valid email and password");
+		}
+	}
 
 	@Override
 	public void emailVerify(UserDTO userDTO) {
 		User user = userdao.findByEmail(userDTO.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
+
 		if (user == null) {
 			throw new ResourceNotFoundException("user", "email", userDTO.getEmail());
 		} else if (user.isEmailVerified()) {
 			throw new ResourceBadRequestException("student already verify");
-		} else if (userDTO.getOtp().equals(user.getEmailotp())) {
+		} else if (userDTO.getOtp().equals(user.getEmailotp()) && !user.isIsemailOtpUsed()
+				&& user.getExpiryDateEmailOtp().isAfter(LocalDateTime.now())) {
 			user.setEmailVerified(true);
+			user.setIsemailOtpUsed(true);
 			userdao.save(user);
 		} else {
-			throw new ResourceBadRequestException("internal error");
+			throw new ResourceBadRequestException("invalid or used OTP or expire OTP");
 
 		}
 
@@ -90,10 +90,14 @@ public class UserServiceImpl implements UserService {
 	public void updateEmail(int id, UserDTO userDTO) {
 		User user = userdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
+		if (id == userDTO.getCurrentUserId()) {
+			user.setEmail(userDTO.getEmail());
+			user.setEmailVerified(false);
+			userdao.save(user);
+		} else {
+			throw new ResourceBadRequestException("you are not allwed");
 
-		user.setEmail(userDTO.getEmail());
-		user.setEmailVerified(false);
-		userdao.save(user);
+		}
 
 	}
 
@@ -101,13 +105,18 @@ public class UserServiceImpl implements UserService {
 	public void addPhone(int id, UserDTO userDTO) {
 		User user = userdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
+		if (id == userDTO.getCurrentUserId()) {
+			user.setPhone(userDTO.getPhone());
+			user.setPhoneverified(false);
+			String otp = phoneservice.genereteOtp();
+			phoneservice.sendOtp(userDTO.getPhone(), otp);
+			user.setExpiryDatePhoneOtp(LocalDateTime.now().plusMinutes(10));
+			user.setPhoneotp(otp);
+			userdao.save(user);
+		} else {
+			throw new ResourceBadRequestException("you are not allwed");
 
-		user.setPhone(userDTO.getPhone());
-		user.setPhoneverified(false);
-		String otp = phoneservice.genereteOtp();
-		phoneservice.sendOtp(userDTO.getPhone(), otp);
-		user.setPhoneotp(otp);
-		userdao.save(user);
+		}
 
 	}
 
@@ -120,8 +129,10 @@ public class UserServiceImpl implements UserService {
 
 		} else if (user.isPhoneverified()) {
 			throw new ResourceBadRequestException("student already verify");
-		} else if (userDTO.getOtp().equals(user.getPhoneotp())) {
+		} else if (userDTO.getOtp().equals(user.getPhoneotp()) && !user.isPhoneOtpUsed()
+				&& user.getExpiryDatePhoneOtp().isAfter(LocalDateTime.now())) {
 			user.setPhoneverified(true);
+			user.setPhoneOtpUsed(true);
 			userdao.save(user);
 		} else {
 			throw new ResourceBadRequestException("internal error");
@@ -137,8 +148,9 @@ public class UserServiceImpl implements UserService {
 
 		String otp = emailservice.genereteOtp();
 		user.setEmailotp(otp);
-
+		user.setExpiryDateEmailOtp(LocalDateTime.now().plusMinutes(10));
 		emailservice.sendVerficationEmail(userDTO.getEmail(), otp);
+		user.setIsemailOtpUsed(false);
 		userdao.save(user);
 
 	}
@@ -149,11 +161,16 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-		if (bcrypt.matches(userDTO.getPassword(), user.getPassword())) {
-			user.setPassword(bcrypt.encode(userDTO.getChangePassword()));
-			userdao.save(user);
+		if (id == userDTO.getCurrentUserId()) {
+			if (bcrypt.matches(userDTO.getPassword(), user.getPassword())) {
+				user.setPassword(bcrypt.encode(userDTO.getChangePassword()));
+				userdao.save(user);
+			} else {
+				throw new ResourceBadRequestException("use valid password");
+
+			}
 		} else {
-			throw new ResourceBadRequestException("use valid password");
+			throw new ResourceBadRequestException("you are not allwed");
 
 		}
 
@@ -165,11 +182,13 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 
-		if (userDTO.getOtp().equals(user.getEmailotp())) {
+		if (userDTO.getOtp().equals(user.getEmailotp()) && !user.isIsemailOtpUsed()
+				&& user.getExpiryDateEmailOtp().isAfter(LocalDateTime.now())) {
 			user.setPassword(bcrypt.encode(userDTO.getPassword()));
+			user.setIsemailOtpUsed(true);
 			userdao.save(user);
 		} else {
-			throw new ResourceBadRequestException("use valid otp");
+			throw new ResourceBadRequestException("invalid otp or expire otp or used Otp");
 
 		}
 

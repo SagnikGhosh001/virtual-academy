@@ -39,9 +39,9 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public void addAdmin(AdminDTO adminDTO) {
-		Admin checkadmin = admindao.findById(adminDTO.getUserid())
-				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
-		if (checkadmin.getRole().equals("admin")) {
+//		Admin checkadmin = admindao.findById(adminDTO.getUserid())
+//				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
+//		if (checkadmin.getRole().equals("admin")) {
 			Admin admin = new Admin();
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 			admin.setEmail(adminDTO.getEmail());
@@ -53,9 +53,9 @@ public class AdminServiceImpl implements AdminService {
 			admin.setPhone(adminDTO.getPhone());
 			admin.setPhoneverified(true);
 			admindao.save(admin);
-		} else {
-			throw new ResourceBadRequestException("you are not admin");
-		}
+//		} else {
+//			throw new ResourceBadRequestException("you are not admin");
+//		}
 
 	}
 

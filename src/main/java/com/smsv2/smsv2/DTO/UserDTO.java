@@ -18,4 +18,5 @@ public class UserDTO {
 	private String password;
 	private String otp;
 	private String changePassword;
+	private int currentUserId;
 }

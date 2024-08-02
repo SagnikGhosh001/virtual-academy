@@ -1,6 +1,7 @@
 package com.smsv2.smsv2.serviceimpl;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,6 +123,7 @@ public class StudentServiceImpl implements StudentService {
 		student.setDeptname(dept.getDeptname());
 		student.setSemname(sem.getSemname());
 		String otp = studentemailservice.genereteOtp();
+		student.setExpiryDateEmailOtp(LocalDateTime.now().plusMinutes(10));
 		student.setEmailotp(otp);
 		studentemailservice.sendVerficationEmail(studentDTO.getEmail(), otp);
 		String verificationUrl = "https://example.com/verify-email?otp=" + otp;
