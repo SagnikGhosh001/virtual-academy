@@ -31,7 +31,6 @@ public class GlobalException {
     @ExceptionHandler(ResourceInternalServerErrorException.class)
     public ResponseEntity<?> resourceInternalServerErrorHandling(ResourceInternalServerErrorException exception, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
-        System.out.println("hello world");
         return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
