@@ -113,7 +113,7 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
 		System.out.println("Before checking email");
 
-	    Optional<Student> existingStudent = studentdao.findByEmail(studentDTO.getEmail());
+	    Optional<Student> existingStudent = studentdao.getByEmail(studentDTO.getEmail());
 	    System.out.println("Checking if email already exists");
 
 	    if (existingStudent.isPresent()) {
