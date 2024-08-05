@@ -29,11 +29,11 @@ public class GlobalException {
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorDetails> handleDataIntegrityViolation(DataIntegrityViolationException exception, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Duplicate entry", request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
-    }
+//    @ExceptionHandler(DataIntegrityViolationException.class)
+//    public ResponseEntity<ErrorDetails> handleDataIntegrityViolation(DataIntegrityViolationException exception, WebRequest request) {
+//        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Duplicate entry", request.getDescription(false));
+//        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+//    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> globalExceptionHandling(Exception exception, WebRequest request) {
