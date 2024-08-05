@@ -113,6 +113,7 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
 		Optional<Student> emailSTudent=studentdao.findByEmail(studentDTO.getEmail());
 		if(emailSTudent.isPresent()) {
+			System.out.println("email present");
 			throw new ResourceInternalServerErrorException(studentDTO.getEmail());
 		}
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
