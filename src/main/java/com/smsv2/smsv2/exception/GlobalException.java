@@ -8,36 +8,41 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-
 @ControllerAdvice
 public class GlobalException {
-	//handler method to handling specific exception
+	// handler method to handling specific exception
 	@ExceptionHandler(ResourceNotFoundException.class)
-	public ResponseEntity<?>resourceNotFoundHandling(ResourceNotFoundException exception,WebRequest request)
-	{
-		ErrorDetails errorDetails=
-				new ErrorDetails(new Date(),exception.getMessage(),request.getDescription(false));
-	return new ResponseEntity<>(errorDetails,HttpStatus.NOT_FOUND);
+	public ResponseEntity<?> resourceNotFoundHandling(ResourceNotFoundException exception, WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
-	
-	// Handler method for ResourceBadRequestException
-    @ExceptionHandler(ResourceBadRequestException.class)
-    public ResponseEntity<?> resourceBadRequestHandling(ResourceBadRequestException exception, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
-    
- // Handler method for ResourceInternalServerErrorException
-    @ExceptionHandler(ResourceInternalServerErrorException.class)
-    public ResponseEntity<?> resourceInternalServerErrorHandling(ResourceInternalServerErrorException exception, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 
-    // General handler method for other exceptions
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> globalExceptionHandling(Exception exception, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+	// Handler method for ResourceBadRequestException
+	@ExceptionHandler(ResourceBadRequestException.class)
+	public ResponseEntity<?> resourceBadRequestHandling(ResourceBadRequestException exception, WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+
+	// Handler method for ResourceInternalServerErrorException
+//	@ExceptionHandler(ResourceInternalServerErrorException.class)
+//	public ResponseEntity<?> resourceInternalServerErrorHandling(ResourceInternalServerErrorException exception,
+//			WebRequest request) {
+//		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+//		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+//	}
+	
+	 @ExceptionHandler(ResourceInternalServerErrorException.class)
+	    public ResponseEntity<ErrorDetails> handleResourceInternalServerError(
+	            ResourceInternalServerErrorException exception, WebRequest request) {
+	        ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+	        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+	    }
+
+	// General handler method for other exceptions
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> globalExceptionHandling(Exception exception, WebRequest request) {
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }
