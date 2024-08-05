@@ -112,7 +112,7 @@ public class StudentServiceImpl implements StudentService {
 		Dept dept = deptdao.findById(studentDTO.getDeptId())
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
 		Optional<Student> emailSTudent=studentdao.findByEmail(studentDTO.getEmail());
-		if(emailSTudent.isPresent()) {
+		if(!emailSTudent.isEmpty()) {
 			System.out.println("email present");
 			throw new ResourceInternalServerErrorException(studentDTO.getEmail());
 		}
