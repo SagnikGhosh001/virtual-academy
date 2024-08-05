@@ -79,8 +79,8 @@ public class SubController {
 		
 		
 	}
-	@DeleteMapping("/deleteAllSubbyDept")
-	public ResponseEntity<?> deleteAllSubbyDept(@RequestBody int deptId,@RequestBody SubDTO subDTO) {
+	@DeleteMapping("/deleteAllSubbyDept/{deptId}")
+	public ResponseEntity<?> deleteAllSubbyDept(@PathVariable int deptId,@RequestBody SubDTO subDTO) {
 			this.subService.delteSubByDept(deptId,subDTO);
 			return new ResponseEntity<>( HttpStatus.OK);
 		

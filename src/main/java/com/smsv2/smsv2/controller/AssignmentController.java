@@ -97,10 +97,10 @@ public class AssignmentController {
 		
 	}
 
-	@DeleteMapping("/deleteAllassignmentBySub")
-	public ResponseEntity<?> deleteAllAssignmentBySub(@RequestBody AssignmentDTO assignmentDTO) {
+	@DeleteMapping("/deleteAllassignmentBySub/{subid}")
+	public ResponseEntity<?> deleteAllAssignmentBySub(@PathVariable int subid,@RequestBody AssignmentDTO assignmentDTO) {
 
-			this.assignmentservice.deleteAllAssignmentBySub(assignmentDTO);
+			this.assignmentservice.deleteAllAssignmentBySub(subid,assignmentDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 	}
 

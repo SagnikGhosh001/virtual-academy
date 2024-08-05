@@ -37,7 +37,7 @@ public interface AttendenceService {
 	void deleteAllAttendence(AttendenceDTO attendenceDTO);
 
 	// delete all attendence by sub
-	void deleteAllAttendenceSub(AttendenceDTO attendenceDTO);
+	void deleteAllAttendenceSub(int subId,AttendenceDTO attendenceDTO);
 	
 	// delete all attendence by dept
 	// void deleteAllAttendenceDept(int deptId);

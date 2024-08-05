@@ -92,10 +92,10 @@ public class AttendenceController {
 		
 	}
 
-	@DeleteMapping("/deleteattendencebySubId")
-	public ResponseEntity<?> deleteAttendencebySubId(@RequestBody AttendenceDTO attendenceDTO) {
+	@DeleteMapping("/deleteattendencebySubId/{subId}")
+	public ResponseEntity<?> deleteAttendencebySubId(@PathVariable int subId,@RequestBody AttendenceDTO attendenceDTO) {
 
-			this.attendenceService.deleteAllAttendenceSub(attendenceDTO);
+			this.attendenceService.deleteAllAttendenceSub(subId,attendenceDTO);
 			return new ResponseEntity<>(HttpStatus.OK);
 
 		

@@ -35,7 +35,7 @@ public interface AssignmentService {
 	void delteAssignmentById(int id,AssignmentDTO assignmentDTO);
 
 	// delete all assignment of same subject
-	void deleteAllAssignmentBySub(AssignmentDTO assignmentDTO);
+	void deleteAllAssignmentBySub(int subid,AssignmentDTO assignmentDTO);
 
 	// delete all assignment
 	void deleteAllAssignment(AssignmentDTO assignmentDTO);

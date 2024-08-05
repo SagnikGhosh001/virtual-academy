@@ -127,13 +127,13 @@ public class AttendenceServiceImpl implements AttendenceService {
 	}
 
 	@Override
-	public void deleteAllAttendenceSub(AttendenceDTO attendenceDTO) {
+	public void deleteAllAttendenceSub(int subId,AttendenceDTO attendenceDTO) {
 		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
-		Sub sub = subdao.findById(attendenceDTO.getSubId())
+		Sub sub = subdao.findById(subId)
 				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", attendenceDTO.getSubId()));
 		if (teacher.getSub().contains(sub)) {
-			List<Attendence> existAttendence = attendencedao.findBySubid_Id(attendenceDTO.getSubId());
+			List<Attendence> existAttendence = attendencedao.findBySubid_Id(subId);
 			attendencedao.deleteAll(existAttendence);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
