@@ -11,15 +11,15 @@ import java.sql.SQLException;
 @Component
 public class CustomExceptionTranslator {
 
-    public RuntimeException translateExceptionIfPossible(RuntimeException ex) {
-        if (ex instanceof DataIntegrityViolationException) {
-            if (ex.getCause() instanceof ConstraintViolationException) {
-                ConstraintViolationException cve = (ConstraintViolationException) ex.getCause();
-                if ("23000".equals(cve.getSQLState())) {
-                    return new ResourceInternalServerErrorException(cve.getConstraintName());
-                }
-            }
-        }
-        return ex;
-    }
+//    public RuntimeException translateExceptionIfPossible(RuntimeException ex) {
+//        if (ex instanceof DataIntegrityViolationException) {
+//            if (ex.getCause() instanceof ConstraintViolationException) {
+//                ConstraintViolationException cve = (ConstraintViolationException) ex.getCause();
+//                if ("23000".equals(cve.getSQLState())) {
+//                    return new ResourceInternalServerErrorException(cve.getConstraintName());
+//                }
+//            }
+//        }
+//        return ex;
+//    }
 }
