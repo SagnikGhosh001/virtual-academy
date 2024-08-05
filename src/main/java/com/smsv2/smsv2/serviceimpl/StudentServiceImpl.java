@@ -111,11 +111,11 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", studentDTO.getSemId()));
 		Dept dept = deptdao.findById(studentDTO.getDeptId())
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
-		Optional<Student> emailSTudent=studentdao.findByEmail(studentDTO.getEmail());
-		if(!emailSTudent.isEmpty()) {
-			System.out.println("email present");
-			throw new ResourceInternalServerErrorException(studentDTO.getEmail());
-		}
+		System.out.println("before if"); 
+		if (studentdao.findByEmail(studentDTO.getEmail()).isPresent()) {
+		     System.out.println("email error");   
+			 throw new ResourceInternalServerErrorException(studentDTO.getEmail());
+		    }
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 		Student student = new Student();
 		student.setDept(dept);
