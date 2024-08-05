@@ -37,9 +37,9 @@ public class BookController {
 		return new ResponseEntity<>(bookservice.getAllBookById(id), HttpStatus.OK);
 	}
 
-	@GetMapping("/booksbySemId/{semid}")
-	public ResponseEntity<?> booksbySemId(@PathVariable("semid") int semid) {
-		return new ResponseEntity<>(bookservice.getAllBookBySubId(semid), HttpStatus.OK);
+	@GetMapping("/booksbySubId/{subid}")
+	public ResponseEntity<?> booksbySemId(@PathVariable("subid") int subid) {
+		return new ResponseEntity<>(bookservice.getAllBookBySubId(subid), HttpStatus.OK);
 	}
 
 	@PostMapping("/uploadpdf/{id}/{role}")

@@ -54,9 +54,9 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public List<Book> getAllBookBySubId(int deptId) {
+	public List<Book> getAllBookBySubId(int subid) {
 
-		return bookdao.findBySubId(deptId);
+		return bookdao.findBySubId(subid);
 	}
 
 	@Override
