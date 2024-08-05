@@ -17,10 +17,12 @@ import com.smsv2.smsv2.dao.DeptDao;
 import com.smsv2.smsv2.dao.SemDao;
 import com.smsv2.smsv2.dao.StudentDao;
 import com.smsv2.smsv2.dao.TeacherDao;
+import com.smsv2.smsv2.dao.UserDao;
 import com.smsv2.smsv2.entity.Dept;
 import com.smsv2.smsv2.entity.Sem;
 import com.smsv2.smsv2.entity.Student;
 import com.smsv2.smsv2.entity.Teacher;
+import com.smsv2.smsv2.entity.User;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
 import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
@@ -41,6 +43,8 @@ public class StudentServiceImpl implements StudentService {
 
 	@Autowired
 	private TeacherDao teacherdao;
+	@Autowired
+	private UserDao userdao;
 
 	@Autowired
 	private EmailService studentemailservice;
@@ -113,7 +117,7 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
 		System.out.println("Before checking email");
 
-	    Optional<Student> existingStudent = studentdao.getByEmail(studentDTO.getEmail());
+	    Optional<User> existingStudent = userdao.findByEmail(studentDTO.getEmail());
 	    System.out.println("Checking if email already exists");
 
 	    if (existingStudent.isPresent()) {

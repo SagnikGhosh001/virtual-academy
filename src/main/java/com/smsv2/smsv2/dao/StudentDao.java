@@ -25,9 +25,7 @@ public interface StudentDao extends JpaRepository<Student, Integer> {
 	
 	List<Student> findBySemId(int semId);
 	
-	
-	@Query("SELECT s FROM Student s WHERE s.email = :email")
-    Optional<Student> getByEmail(@Param("email") String email);
+
 	
 	@Query("SELECT s FROM Student s WHERE s.sem.id = ?1 AND s.dept.id = ?2")
 	List<Student> getByDeptandSem(int sem,int dept);
