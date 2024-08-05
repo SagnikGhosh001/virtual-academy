@@ -24,6 +24,7 @@ import com.smsv2.smsv2.entity.Sem;
 import com.smsv2.smsv2.entity.Student;
 import com.smsv2.smsv2.entity.Teacher;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
+import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.TeacherService;
 
@@ -109,6 +110,10 @@ public class TeacherServiceImpl implements TeacherService {
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", teacherDTO.getDeptId()));
 		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
 		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
+		Optional<Teacher> emailTeacher=teacherdao.findByEmail(teacherDTO.getEmail());
+		if(emailTeacher.isPresent()) {
+			throw new ResourceInternalServerErrorException(teacherDTO.getEmail());
+		}
 		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();

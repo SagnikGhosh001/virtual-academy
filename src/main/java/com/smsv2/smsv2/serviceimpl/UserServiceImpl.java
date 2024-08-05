@@ -3,6 +3,7 @@ package com.smsv2.smsv2.serviceimpl;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +18,7 @@ import com.smsv2.smsv2.dao.UserDao;
 import com.smsv2.smsv2.entity.LoginResponse;
 import com.smsv2.smsv2.entity.User;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
+import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.UserService;
 
@@ -89,7 +91,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void updateEmail(int id, UserDTO userDTO) {
 		User user = userdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
+				.orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
+		Optional<User> emailUser=userdao.findByEmail(userDTO.getEmail());
+		if(emailUser.isPresent()) {
+			throw new ResourceInternalServerErrorException(userDTO.getEmail());
+		}
 		if (id == userDTO.getCurrentUserId()) {
 			user.setEmail(userDTO.getEmail());
 			user.setEmailVerified(false);
@@ -104,7 +110,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void addPhone(int id, UserDTO userDTO) {
 		User user = userdao.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
+				.orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
+		Optional<User> emailUser=userdao.findByPhone(userDTO.getPhone());
+		if(emailUser.isPresent()) {
+			throw new ResourceInternalServerErrorException(userDTO.getPhone());
+		}
 		if (id == userDTO.getCurrentUserId()) {
 			user.setPhone(userDTO.getPhone());
 			user.setPhoneverified(false);

@@ -3,17 +3,18 @@ package com.smsv2.smsv2.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-public class ResourceBadRequestException extends RuntimeException {
+@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+public class ResourceInternalServerErrorException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
     private String msg;
 
-    public ResourceBadRequestException(String msg) {
-        super(String.format("Bad request for : '%s'", msg));
+    public ResourceInternalServerErrorException(String msg) {
+        super(String.format("'%s' Already Exist", msg));
         this.msg = msg;
     }
+    
     
     public String getMsg() {
         return msg;
@@ -22,5 +23,4 @@ public class ResourceBadRequestException extends RuntimeException {
     public void setMsg(String msg) {
         this.msg = msg;
     }
-
 }

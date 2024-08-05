@@ -26,6 +26,13 @@ public class GlobalException {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
+    
+ // Handler method for ResourceInternalServerErrorException
+    @ExceptionHandler(ResourceInternalServerErrorException.class)
+    public ResponseEntity<?> resourceInternalServerErrorHandling(ResourceInternalServerErrorException exception, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     // General handler method for other exceptions
     @ExceptionHandler(Exception.class)

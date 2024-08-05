@@ -42,6 +42,7 @@ public class User {
 	@Email(message = "Email should be valid")
 	private String email;
 //	@Pattern(regexp = "^\\d{10}$", message = "Phone number must be 10 digits")
+	@Column(unique = true)
 	private String phone;
 
 	@Column(nullable = false)

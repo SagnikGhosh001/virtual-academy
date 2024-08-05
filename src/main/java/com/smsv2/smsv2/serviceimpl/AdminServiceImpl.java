@@ -14,6 +14,7 @@ import com.smsv2.smsv2.dao.AdminDao;
 import com.smsv2.smsv2.entity.Admin;
 import com.smsv2.smsv2.entity.Student;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
+import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.AdminService;
 
@@ -41,6 +42,12 @@ public class AdminServiceImpl implements AdminService {
 	public void addAdmin(AdminDTO adminDTO) {
 		Admin checkadmin = admindao.findById(adminDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
+		admindao.findByEmail(adminDTO.getEmail()).orElseThrow(() -> new ResourceInternalServerErrorException(adminDTO.getEmail()));
+		Optional<Admin> emailAdmin=admindao.findByEmail(adminDTO.getEmail());
+		if(emailAdmin.isPresent()) {
+			throw new ResourceInternalServerErrorException(adminDTO.getEmail());
+		}
+
 		if (checkadmin.getRole().equals("admin")) {
 			Admin admin = new Admin();
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
@@ -62,6 +69,11 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public void updateAdmin(int id, AdminDTO adminDTO) {
 		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
+		admindao.findByEmail(adminDTO.getEmail()).orElseThrow(() -> new ResourceInternalServerErrorException(adminDTO.getEmail()));
+		Optional<Admin> emailAdmin=admindao.findByEmail(adminDTO.getEmail());
+		if(emailAdmin.isPresent()) {
+			throw new ResourceInternalServerErrorException(adminDTO.getEmail());
+		}
 		if (adminDTO.getUserid() == admin.getId()) {
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 			admin.setEmail(adminDTO.getEmail());

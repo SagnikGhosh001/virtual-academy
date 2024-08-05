@@ -24,6 +24,7 @@ import com.smsv2.smsv2.entity.Sem;
 import com.smsv2.smsv2.entity.Student;
 import com.smsv2.smsv2.entity.Teacher;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
+import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.DeptService;
 
@@ -105,6 +106,10 @@ public class DeptServiceImpl implements DeptService {
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", deptDTO.getSemId()));
 		Optional<Teacher> teacher = teacherDao.findById(deptDTO.getUserid());
 		Optional<Admin> admin = adminDao.findById(deptDTO.getUserid());
+		Dept nameDept=deptDao.findByDeptname(deptDTO.getDeptname());
+		if(nameDept!=null) {
+			throw new ResourceInternalServerErrorException(nameDept.getDeptname());
+		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
 			dept.setDeptname(deptDTO.getDeptname());

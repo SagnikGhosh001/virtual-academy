@@ -22,6 +22,7 @@ import com.smsv2.smsv2.entity.Sem;
 import com.smsv2.smsv2.entity.Student;
 import com.smsv2.smsv2.entity.Teacher;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
+import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.StudentService;
 
@@ -110,6 +111,10 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", studentDTO.getSemId()));
 		Dept dept = deptdao.findById(studentDTO.getDeptId())
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
+		Optional<Student> emailSTudent=studentdao.findByEmail(studentDTO.getEmail());
+		if(emailSTudent.isPresent()) {
+			throw new ResourceInternalServerErrorException(studentDTO.getEmail());
+		}
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 		Student student = new Student();
 		student.setDept(dept);

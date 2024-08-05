@@ -25,6 +25,7 @@ import com.smsv2.smsv2.entity.Student;
 import com.smsv2.smsv2.entity.Sub;
 import com.smsv2.smsv2.entity.Teacher;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
+import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
 import com.smsv2.smsv2.service.SemService;
 
@@ -80,6 +81,10 @@ public class SemServiceImpl implements SemService {
 	public void addSem(SemDTO semDTO) {
 		Optional<Teacher> teacher = teacherDao.findById(semDTO.getUserid());
 		Optional<Admin> admin = adminDao.findById(semDTO.getUserid());
+		Sem nameSem=semdao.findBySemname(semDTO.getSemname());
+		if(nameSem!=null) {
+			throw new ResourceInternalServerErrorException(nameSem.getSemname());
+		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
 			Sem sem = new Sem();
@@ -96,6 +101,10 @@ public class SemServiceImpl implements SemService {
 		Sem existSem = semdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("sem", "id", id));
 		Optional<Teacher> teacher = teacherDao.findById(semDTO.getUserid());
 		Optional<Admin> admin = adminDao.findById(semDTO.getUserid());
+		Sem nameSem=semdao.findBySemname(semDTO.getSemname());
+		if(nameSem!=null) {
+			throw new ResourceInternalServerErrorException(nameSem.getSemname());
+		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
 			existSem.setSemname(semDTO.getSemname());
