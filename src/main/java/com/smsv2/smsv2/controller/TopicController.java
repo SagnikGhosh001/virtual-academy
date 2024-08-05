@@ -91,7 +91,7 @@ public class TopicController {
 
 	}
 
-	@DeleteMapping("/deleteTopicbySubId/{subId}/{role}")
+	@DeleteMapping("/deleteTopicbySubId/{subId}")
 	public ResponseEntity<?> deleteTopicbySubId(@PathVariable int subId, 
 			@RequestBody TopicDTO topicDTO) {
 			this.topicService.delteTopicBySubId(subId, topicDTO);
