@@ -1,7 +1,6 @@
 package com.smsv2.smsv2.exception;
 
 import java.util.Date;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,12 +27,6 @@ public class GlobalException {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), exception.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
-
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public ResponseEntity<ErrorDetails> handleDataIntegrityViolation(DataIntegrityViolationException exception, WebRequest request) {
-//        ErrorDetails errorDetails = new ErrorDetails(new Date(), "Duplicate entry", request.getDescription(false));
-//        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
-//    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetails> globalExceptionHandling(Exception exception, WebRequest request) {
