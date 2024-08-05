@@ -39,11 +39,11 @@ public class Sem {
 	
 	@ManyToMany(mappedBy = "sem",cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	@JsonBackReference
-	private List<Dept> dept=new ArrayList<>();
+	private List<Dept> dept;
 	
 	@ManyToMany(mappedBy = "sem")
 	@JsonBackReference
-	private List<Teacher> teacher=new ArrayList<>();
+	private List<Teacher> teacher;
 	
 	@OneToMany(mappedBy = "sem")
 	@JsonBackReference

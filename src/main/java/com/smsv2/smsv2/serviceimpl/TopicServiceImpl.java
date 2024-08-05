@@ -109,8 +109,9 @@ public class TopicServiceImpl implements TopicService {
 		List<Topic> existTopic = topicdao.findBySubId(subId);
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
-
-		if (teacher.getSub().stream().anyMatch(s -> s.getId() == subId)) {
+		Sub sub = subdao.findById(topicDTO.getSubId())
+				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", topicDTO.getSubId()));
+		if (teacher.getSub().contains(sub)) {
 			topicdao.deleteAll(existTopic);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");

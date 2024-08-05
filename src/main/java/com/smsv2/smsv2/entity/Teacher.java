@@ -1,6 +1,6 @@
 package com.smsv2.smsv2.entity;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 import javax.validation.constraints.Email;
@@ -49,13 +49,13 @@ public class Teacher extends User{
 	private String role = "teacher";
 
 	@ManyToMany
-	private List<Sem> sem = new ArrayList<>();
+	private List<Sem> sem ;
 
 	
 
 	@OneToMany(mappedBy = "teacher")
 	@JsonBackReference
-	private List<Sub> sub = new ArrayList<>();
+	private List<Sub> sub ;
 
 	@ManyToOne
 	@JsonBackReference
@@ -65,11 +65,11 @@ public class Teacher extends User{
 	
 	@OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JsonBackReference
-	private List<Inbox> inbox = new ArrayList<>();
+	private List<Inbox> inbox ;
 
 	@OneToMany(mappedBy = "teacherId")
 	@JsonBackReference
-	private List<Assignment> assignment = new ArrayList<>();
+	private List<Assignment> assignment;
 
 	
 

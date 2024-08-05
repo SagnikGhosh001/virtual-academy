@@ -49,11 +49,11 @@ public class Student extends User {
 
 	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JsonBackReference
-	private List<Inbox> inbox = new ArrayList<>();
+	private List<Inbox> inbox ;
 
 	@OneToMany(mappedBy = "reg", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JsonBackReference
-	private List<Marks> marks = new ArrayList<>();
+	private List<Marks> marks ;
 
 	@ManyToOne
 	@JsonBackReference

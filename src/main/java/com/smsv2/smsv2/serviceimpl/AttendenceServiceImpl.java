@@ -61,7 +61,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		Optional<Attendence> nameattendence=attendencedao.findByName(attendenceDTO.getName());
 		if(nameattendence.isPresent()) {
-			throw new ResourceInternalServerErrorException(attendenceDTO.getName())
+			throw new ResourceInternalServerErrorException(attendenceDTO.getName());
 		}
 		if (attendenceDTO.getTeacherId() == sub.getTeacher().getId()) {
 			Attendence attendence = new Attendence();
@@ -88,7 +88,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		Optional<Attendence> nameattendence=attendencedao.findByName(attendenceDTO.getName());
 		if(nameattendence.isPresent()) {
-			throw new ResourceInternalServerErrorException(attendenceDTO.getName())
+			throw new ResourceInternalServerErrorException(attendenceDTO.getName());
 		}
 		if (existAttendence.getSubid().getTeacher().getId() == attendenceDTO.getTeacherId()) {
 			existAttendence.setName(attendenceDTO.getName());
@@ -130,8 +130,9 @@ public class AttendenceServiceImpl implements AttendenceService {
 	public void deleteAllAttendenceSub(AttendenceDTO attendenceDTO) {
 		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
-
-		if (teacher.getSub().stream().anyMatch(s -> s.getId() == attendenceDTO.getSubId())) {
+		Sub sub = subdao.findById(attendenceDTO.getSubId())
+				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", attendenceDTO.getSubId()));
+		if (teacher.getSub().contains(sub)) {
 			List<Attendence> existAttendence = attendencedao.findBySubid_Id(attendenceDTO.getSubId());
 			attendencedao.deleteAll(existAttendence);
 		} else {

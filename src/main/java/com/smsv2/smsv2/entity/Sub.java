@@ -54,14 +54,14 @@ public class Sub {
 	
 	@OneToMany(mappedBy = "sub",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference
-	private List<Assignment> assignment=new ArrayList<>();
+	private List<Assignment> assignment;
 	@OneToMany(mappedBy = "sub",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference
-	private List<Topic> topic=new ArrayList<>();
+	private List<Topic> topics;
 	
 	@OneToMany(mappedBy = "sub",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference
-	private List<Marks> marks= new ArrayList<>();
+	private List<Marks> marks;
 	
 	@OneToMany(mappedBy = "sub",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference

@@ -127,7 +127,9 @@ public class AssignmentServiceImpl implements AssignmentService {
 	public void deleteAllAssignmentBySub(AssignmentDTO assignmentDTO) {
 		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
-		if (teacher.getSub().stream().anyMatch(s -> s.getId() == assignmentDTO.getSubId())) {
+		Sub sub = subdao.findById(assignmentDTO.getSubId())
+				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", assignmentDTO.getSubId()));
+		if (teacher.getSub().contains(sub)) {
 			List<Assignment> assignment = assignmentdao.findBySubId(assignmentDTO.getSubId());
 			if (!assignment.isEmpty()) {
 				assignmentdao.deleteAll(assignment);

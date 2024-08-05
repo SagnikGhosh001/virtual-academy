@@ -1,7 +1,9 @@
 package com.smsv2.smsv2.entity;
 
+
 import java.util.ArrayList;
 import java.util.List;
+
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -38,24 +40,24 @@ public class Dept {
 	
 	@ManyToMany
 	@JsonBackReference
-	private List<Sem> sem=new ArrayList<>();
+	private List<Sem> sem;
 	
 	@OneToMany(mappedBy = "dept",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference
-	private List<Sub> sub=new ArrayList<>();
+	private List<Sub> sub;
 	
 	@OneToMany(mappedBy = "dept")
 	@JsonBackReference
-	private List<Teacher> teacher=new ArrayList<>();
+	private List<Teacher> teacher;
 	
 	@OneToMany(mappedBy = "dept")
 	@JsonBackReference
-	private List<Student> student = new ArrayList<>();
+	private List<Student> student;
 	
 
 	@OneToMany(mappedBy = "dept",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference
-	private List<Syllabus> syllabus = new ArrayList<>();
+	private List<Syllabus> syllabus;
 	
 	
 }
