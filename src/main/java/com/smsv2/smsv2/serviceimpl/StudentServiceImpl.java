@@ -115,17 +115,12 @@ public class StudentServiceImpl implements StudentService {
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", studentDTO.getSemId()));
 		Dept dept = deptdao.findById(studentDTO.getDeptId())
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", studentDTO.getDeptId()));
-		System.out.println("Before checking email");
-
+	
 	    Optional<User> existingStudent = userdao.findByEmail(studentDTO.getEmail());
-	    System.out.println("Checking if email already exists");
-
 	    if (existingStudent.isPresent()) {
-	        System.out.println("Email error: Email already exists");
 	        throw new ResourceInternalServerErrorException(studentDTO.getEmail());
 	    }
 
-	    System.out.println("Email is unique, proceeding with student creation");
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 		Student student = new Student();
 		student.setDept(dept);
