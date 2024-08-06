@@ -11,8 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.smsv2.smsv2.DTO.AdminDTO;
 import com.smsv2.smsv2.dao.AdminDao;
+import com.smsv2.smsv2.dao.UserDao;
 import com.smsv2.smsv2.entity.Admin;
 import com.smsv2.smsv2.entity.Student;
+import com.smsv2.smsv2.entity.User;
 import com.smsv2.smsv2.exception.ResourceBadRequestException;
 import com.smsv2.smsv2.exception.ResourceInternalServerErrorException;
 import com.smsv2.smsv2.exception.ResourceNotFoundException;
@@ -23,6 +25,8 @@ public class AdminServiceImpl implements AdminService {
 
 	@Autowired
 	private AdminDao admindao;
+	@Autowired
+	private UserDao userdao;
 
 	@Override
 	public List<Admin> getAllAdmin() {
@@ -42,10 +46,14 @@ public class AdminServiceImpl implements AdminService {
 	public void addAdmin(AdminDTO adminDTO) {
 		Admin checkadmin = admindao.findById(adminDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
-		admindao.findByEmail(adminDTO.getEmail()).orElseThrow(() -> new ResourceInternalServerErrorException(adminDTO.getEmail()));
-		Optional<Admin> emailAdmin=admindao.findByEmail(adminDTO.getEmail());
+		Optional<User> emailAdmin=userdao.findByEmail(adminDTO.getEmail());
+		Optional<User> phoneAdmin=userdao.findByPhone(adminDTO.getPhone());
 		if(emailAdmin.isPresent()) {
-			throw new ResourceInternalServerErrorException(adminDTO.getEmail());
+			throw new ResourceInternalServerErrorException("admin","email",adminDTO.getEmail());
+		}
+		
+		if(phoneAdmin.isPresent()) {
+			throw new ResourceInternalServerErrorException("admin","phone",adminDTO.getPhone());
 		}
 
 		if (checkadmin.getRole().equals("admin")) {
@@ -69,10 +77,14 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public void updateAdmin(int id, AdminDTO adminDTO) {
 		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
-		admindao.findByEmail(adminDTO.getEmail()).orElseThrow(() -> new ResourceInternalServerErrorException(adminDTO.getEmail()));
-		Optional<Admin> emailAdmin=admindao.findByEmail(adminDTO.getEmail());
+		Optional<User> emailAdmin=userdao.findByEmail(adminDTO.getEmail());
+		Optional<User> phoneAdmin=userdao.findByPhone(adminDTO.getPhone());
 		if(emailAdmin.isPresent()) {
-			throw new ResourceInternalServerErrorException(adminDTO.getEmail());
+			throw new ResourceInternalServerErrorException("admin","email",adminDTO.getEmail());
+		}
+		
+		if(phoneAdmin.isPresent()) {
+			throw new ResourceInternalServerErrorException("admin","phone",adminDTO.getPhone());
 		}
 		if (adminDTO.getUserid() == admin.getId()) {
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();

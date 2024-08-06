@@ -83,7 +83,7 @@ public class SemServiceImpl implements SemService {
 		Optional<Admin> admin = adminDao.findById(semDTO.getUserid());
 		Sem nameSem=semdao.findBySemname(semDTO.getSemname());
 		if(nameSem!=null) {
-			throw new ResourceInternalServerErrorException(nameSem.getSemname());
+			throw new ResourceInternalServerErrorException("sem","name",nameSem.getSemname());
 		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
@@ -103,7 +103,7 @@ public class SemServiceImpl implements SemService {
 		Optional<Admin> admin = adminDao.findById(semDTO.getUserid());
 		Sem nameSem=semdao.findBySemname(semDTO.getSemname());
 		if(nameSem!=null) {
-			throw new ResourceInternalServerErrorException(nameSem.getSemname());
+			throw new ResourceInternalServerErrorException("sem","name",nameSem.getSemname());
 		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {

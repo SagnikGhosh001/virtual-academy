@@ -108,7 +108,7 @@ public class DeptServiceImpl implements DeptService {
 		Optional<Admin> admin = adminDao.findById(deptDTO.getUserid());
 		Dept nameDept=deptDao.findByDeptname(deptDTO.getDeptname());
 		if(nameDept!=null) {
-			throw new ResourceInternalServerErrorException(nameDept.getDeptname());
+			throw new ResourceInternalServerErrorException("dept","name",nameDept.getDeptname());
 		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {

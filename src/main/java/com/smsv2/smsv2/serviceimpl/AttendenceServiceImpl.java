@@ -61,7 +61,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		Optional<Attendence> nameattendence=attendencedao.findByName(attendenceDTO.getName());
 		if(nameattendence.isPresent()) {
-			throw new ResourceInternalServerErrorException(attendenceDTO.getName());
+			throw new ResourceInternalServerErrorException("attendence","name",attendenceDTO.getName());
 		}
 		if (attendenceDTO.getTeacherId() == sub.getTeacher().getId()) {
 			Attendence attendence = new Attendence();
@@ -88,7 +88,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		Optional<Attendence> nameattendence=attendencedao.findByName(attendenceDTO.getName());
 		if(nameattendence.isPresent()) {
-			throw new ResourceInternalServerErrorException(attendenceDTO.getName());
+			throw new ResourceInternalServerErrorException("attendence","name",attendenceDTO.getName());
 		}
 		if (existAttendence.getSubid().getTeacher().getId() == attendenceDTO.getTeacherId()) {
 			existAttendence.setName(attendenceDTO.getName());

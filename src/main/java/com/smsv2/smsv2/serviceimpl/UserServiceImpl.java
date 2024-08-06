@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
 		Optional<User> emailUser=userdao.findByEmail(userDTO.getEmail());
 		if(emailUser.isPresent()) {
-			throw new ResourceInternalServerErrorException(userDTO.getEmail());
+			throw new ResourceInternalServerErrorException("user","email",userDTO.getEmail());
 		}
 		if (id == userDTO.getCurrentUserId()) {
 			user.setEmail(userDTO.getEmail());
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
 				.orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
 		Optional<User> emailUser=userdao.findByPhone(userDTO.getPhone());
 		if(emailUser.isPresent()) {
-			throw new ResourceInternalServerErrorException(userDTO.getPhone());
+			throw new ResourceInternalServerErrorException("user","phone",userDTO.getPhone());
 		}
 		if (id == userDTO.getCurrentUserId()) {
 			user.setPhone(userDTO.getPhone());

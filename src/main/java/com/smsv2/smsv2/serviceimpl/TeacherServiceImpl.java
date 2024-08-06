@@ -112,7 +112,7 @@ public class TeacherServiceImpl implements TeacherService {
 		Optional<Admin> admin = adminDao.findById(teacherDTO.getUserId());
 		Optional<Teacher> emailTeacher=teacherdao.findByEmail(teacherDTO.getEmail());
 		if(emailTeacher.isPresent()) {
-			throw new ResourceInternalServerErrorException(teacherDTO.getEmail());
+			throw new ResourceInternalServerErrorException("teacher","email",teacherDTO.getEmail());
 		}
 		if ((checkteacher.isPresent() && checkteacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {

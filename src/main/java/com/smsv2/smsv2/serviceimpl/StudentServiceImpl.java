@@ -118,7 +118,7 @@ public class StudentServiceImpl implements StudentService {
 	
 	    Optional<User> existingStudent = userdao.findByEmail(studentDTO.getEmail());
 	    if (existingStudent.isPresent()) {
-	        throw new ResourceInternalServerErrorException(studentDTO.getEmail());
+	        throw new ResourceInternalServerErrorException("student","email",studentDTO.getEmail());
 	    }
 
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
