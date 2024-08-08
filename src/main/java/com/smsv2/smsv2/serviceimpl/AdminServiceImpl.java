@@ -44,8 +44,8 @@ public class AdminServiceImpl implements AdminService {
 
 	@Override
 	public void addAdmin(AdminDTO adminDTO) {
-		Admin checkadmin = admindao.findById(adminDTO.getUserid())
-				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
+		// Admin checkadmin = admindao.findById(adminDTO.getUserid())
+		// 		.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
 		Optional<User> emailAdmin=userdao.findByEmail(adminDTO.getEmail());
 		Optional<User> phoneAdmin=userdao.findByPhone(adminDTO.getPhone());
 		if(emailAdmin.isPresent()) {
