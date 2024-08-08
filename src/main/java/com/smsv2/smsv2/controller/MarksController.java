@@ -38,6 +38,10 @@ public class MarksController {
 	public ResponseEntity<?> marksByReg(@PathVariable("reg") String reg) {
 		return new ResponseEntity<>(marksservice.getAllMarksByReg(reg), HttpStatus.OK);
 	}
+	@PostMapping("/marksByRegSem")
+	public ResponseEntity<?> marksByRegSem(@RequestBody MarksDTO marksDTO) {
+		return new ResponseEntity<>(marksservice.getAllMarksByRegSem(marksDTO), HttpStatus.OK);
+	}
 
 	@PostMapping("/addmarks")
 	public ResponseEntity<?> addmarks(@RequestBody MarksDTO marksDTO) {

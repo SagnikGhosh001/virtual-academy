@@ -129,7 +129,6 @@ public class StudentServiceImpl implements StudentService {
 		student.setName(studentDTO.getName());
 		student.setGender(studentDTO.getGender());
 		student.setPassword(bcrypt.encode(studentDTO.getPassword()));
-		student.setReg(studentDTO.getReg());
 		student.setEmailVerified(false);
 		student.setDeptname(dept.getDeptname());
 		student.setSemname(sem.getSemname());

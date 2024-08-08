@@ -44,16 +44,16 @@ public class Student extends User {
 
 	private String role = "student";
 
-	@Column(nullable = false)
+	@Column(nullable = false,unique = true)
 	private String reg;
 
 	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JsonBackReference
-	private List<Inbox> inbox ;
+	private List<Inbox> inbox = new ArrayList<>();
 
 	@OneToMany(mappedBy = "reg", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JsonBackReference
-	private List<Marks> marks ;
+	private List<Marks> marks = new ArrayList<>();
 
 	@ManyToOne
 	@JsonBackReference

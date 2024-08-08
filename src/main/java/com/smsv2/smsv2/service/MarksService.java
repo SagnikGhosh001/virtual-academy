@@ -17,6 +17,8 @@ public interface MarksService {
 
 	// get Marks by reg
 	List<Marks> getAllMarksByReg(String reg);
+	
+	List<Marks> getAllMarksByRegSem(MarksDTO marksDTO);
 
 	// add new Marks
 	void addMarks(MarksDTO marks);

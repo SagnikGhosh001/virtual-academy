@@ -51,7 +51,7 @@ public class User {
 
 	@OneToMany(mappedBy = "user")
 	@JsonBackReference
-	private List<Feedback> feedback;
+	private List<Feedback> feedback= new ArrayList<>();
 	
 	private final String college="Central Calcutta Polytechnic";
 	// verified

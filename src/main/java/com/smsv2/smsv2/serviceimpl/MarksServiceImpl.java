@@ -66,6 +66,12 @@ public class MarksServiceImpl implements MarksService {
 	public List<Marks> getAllMarksByReg(String reg) {
 		return marksDao.findByReg_Reg(reg);
 	}
+	
+	@Override
+	public List<Marks> getAllMarksByRegSem(MarksDTO marksDTO) {
+		return  marksDao.findByReg_RegAndSemname(marksDTO.getReg(),marksDTO.getSemname());
+	
+	}
 
 	@Override
 	public void addMarks(MarksDTO marksDTO) {

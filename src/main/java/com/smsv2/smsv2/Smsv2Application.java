@@ -10,5 +10,4 @@ public class Smsv2Application {
 		SpringApplication.run(Smsv2Application.class, args);
 		System.out.println("Welcome to Virtual Academy");
 	}
-
 }

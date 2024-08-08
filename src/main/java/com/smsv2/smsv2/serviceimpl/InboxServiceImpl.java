@@ -68,7 +68,6 @@ public class InboxServiceImpl implements InboxService {
 				.orElseThrow(() -> new ResourceNotFoundException("student", "reg", inboxDTO.getReg()));
 		Teacher teacher = teacherDao.findById(inboxDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", inboxDTO.getTeacherId()));
-
 		Inbox inbox = new Inbox();
 		inbox.setStudent(student);
 		inbox.setTeacher(teacher);

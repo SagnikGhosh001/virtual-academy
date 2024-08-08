@@ -40,24 +40,24 @@ public class Dept {
 	
 	@ManyToMany
 	@JsonBackReference
-	private List<Sem> sem;
+	private List<Sem> sem= new ArrayList<>();
 	
 	@OneToMany(mappedBy = "dept",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference
-	private List<Sub> sub;
+	private List<Sub> sub= new ArrayList<>();
 	
 	@OneToMany(mappedBy = "dept")
 	@JsonBackReference
-	private List<Teacher> teacher;
+	private List<Teacher> teacher= new ArrayList<>();
 	
 	@OneToMany(mappedBy = "dept")
 	@JsonBackReference
-	private List<Student> student;
+	private List<Student> student= new ArrayList<>();
 	
 
 	@OneToMany(mappedBy = "dept",cascade = CascadeType.ALL,fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonBackReference
-	private List<Syllabus> syllabus;
+	private List<Syllabus> syllabus= new ArrayList<>();
 	
 	
 }

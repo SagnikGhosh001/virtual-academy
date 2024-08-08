@@ -14,7 +14,7 @@ public class MarksDTO {
 	private int mark;
 	private int subId;
 	private String reg;
-	
+	private String semname;
 	private int teacher;
 	
 }
