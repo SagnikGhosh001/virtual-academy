@@ -56,7 +56,7 @@ public class AdminServiceImpl implements AdminService {
 			throw new ResourceInternalServerErrorException("admin","phone",adminDTO.getPhone());
 		}
 
-//		if (checkadmin.getRole().equals("admin")) {
+		// if (checkadmin.getRole().equals("admin")) {
 			Admin admin = new Admin();
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 			admin.setEmail(adminDTO.getEmail());
@@ -68,9 +68,9 @@ public class AdminServiceImpl implements AdminService {
 			admin.setPhone(adminDTO.getPhone());
 			admin.setPhoneverified(true);
 			admindao.save(admin);
-//		} else {
-//			throw new ResourceBadRequestException("you are not admin");
-//		}
+		// } else {
+		// 	throw new ResourceBadRequestException("you are not admin");
+		// }
 
 	}
 
