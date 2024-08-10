@@ -1,0 +1,13 @@
+package com.smsv2.smsv2;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class Smsv2ApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
