@@ -47,7 +47,8 @@ public class BookController {
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
 
-			String message = bookservice.uploadFile(id, file);
+			ResponseEntity<String> responseEntity = bookservice.uploadFile(id, file);
+			String message = responseEntity.getBody(); 
 			return ResponseEntity.status(HttpStatus.OK).body(message);
 		} else {
 			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);

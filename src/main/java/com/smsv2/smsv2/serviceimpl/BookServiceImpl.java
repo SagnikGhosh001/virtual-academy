@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,27 +42,29 @@ public class BookServiceImpl implements BookService {
 	private TeacherDao teacherdao;
 
 	@Override
-	public List<Book> getAllBook() {
-		return bookdao.findAll();
+	public ResponseEntity<List<Book>> getAllBook() {
+		List<Book> book= bookdao.findAll();
+		return new ResponseEntity<>(book,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Book> getAllBookById(int id) {
+	public ResponseEntity<Optional<Book>> getAllBookById(int id) {
 		Optional<Book> book = bookdao.findById(id);
 		if (book.isEmpty()) {
 			throw new ResourceNotFoundException("book","id",id);
 		}
-		return book;
+		return new ResponseEntity<>(book,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Book> getAllBookBySubId(int subid) {
+	public ResponseEntity<List<Book>> getAllBookBySubId(int subid) {
 
-		return bookdao.findBySubId(subid);
+		List<Book> book= bookdao.findBySubId(subid);
+		return new ResponseEntity<>(book,HttpStatus.OK);
 	}
 
 	@Override
-	public void addBook(BookDTO bookDTO) {
+	public ResponseEntity<?> addBook(BookDTO bookDTO) {
 		Sub sub = subdao.findById(bookDTO.getSubId()).orElseThrow(() -> new ResourceNotFoundException("sub","id",bookDTO.getSubId()));
 		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", bookDTO.getUserid()));
@@ -72,13 +76,13 @@ public class BookServiceImpl implements BookService {
 			book.setSemname(sub.getSem().getSemname());
 			book.setSubname(sub.getSubname());
 			bookdao.save(book);
-		
+			return new ResponseEntity<>(book,HttpStatus.CREATED);
 		
 
 	}
 
 	@Override
-	public void updateBook(int id, BookDTO bookDTO) {
+	public ResponseEntity<?> updateBook(int id, BookDTO bookDTO) {
 		Book existBook = bookdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("book","id",id));
 		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
@@ -87,28 +91,29 @@ public class BookServiceImpl implements BookService {
 			existBook.setName(bookDTO.getName());
 			bookdao.save(existBook);
 		
-		
+			return new ResponseEntity<>(existBook,HttpStatus.OK);
 
 	}
 
 	@Override
-	public void delteBookById(int id,BookDTO bookDTO) {
+	public ResponseEntity<?> delteBookById(int id,BookDTO bookDTO) {
 		Book existBook = bookdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("book","id",id));
 		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", bookDTO.getUserid()));
 			bookdao.delete(existBook);
-		
+			return new ResponseEntity<>(HttpStatus.OK);
 		
 		
 	}
 
 	@Override
-	public void deleteAllBook(BookDTO bookDTO) {
+	public ResponseEntity<?> deleteAllBook(BookDTO bookDTO) {
 		Teacher teacher=teacherdao.findById(bookDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", bookDTO.getUserid()));
 		if (teacher.getRole().equals("pic") ) {
 			bookdao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		}else {
 			throw new ResourceBadRequestException("your role should be teacher or pic or hod");
 		}
@@ -117,13 +122,14 @@ public class BookServiceImpl implements BookService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Book book = bookdao.findById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("book","id",id));
 			book.setPdf(file.getBytes()); // Assuming 'pdf' field can hold PDF bytes
 			bookdao.save(book);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}
@@ -133,5 +139,6 @@ public class BookServiceImpl implements BookService {
 	public byte[] downloadFile(int id) {
 		Book book = bookdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("book","id",id));
 		return book.getPdf();
+		
 	}
 }

@@ -3,6 +3,8 @@ package com.smsv2.smsv2.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
+
 import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.InboxDTO;
 import com.smsv2.smsv2.entity.Inbox;
@@ -11,29 +13,29 @@ import com.smsv2.smsv2.entity.Teacher;
 
 public interface InboxService {
 	// get all inbox
-	List<Inbox> getAllInbox();
+	ResponseEntity<List<Inbox>> getAllInbox();
 
 	// get inbox by id
-	Optional<Inbox> getAllInboxById(int id);
+	ResponseEntity<Optional<Inbox>> getAllInboxById(int id);
 
 	// get inbox by student id
-	List<Inbox> getAllinboxByStudentId(int id);
+	ResponseEntity<List<Inbox>> getAllinboxByStudentId(int id);
 
 	// get inbox by student reg
-	List<Inbox> getAllinboxByStudentReg(String reg);
+	ResponseEntity<List<Inbox>> getAllinboxByStudentReg(String reg);
 
 	// get inbox by teacher id
-	List<Inbox> getAllinboxByTeacherId(int teacherId);
+	ResponseEntity<List<Inbox>> getAllinboxByTeacherId(int teacherId);
 
 	// add new Inbox
-	void addInbox(InboxDTO inbox);
+	ResponseEntity<?> addInbox(InboxDTO inbox);
 
 	// update inbox
-	void updateInbox(int id, InboxDTO inbox);
+	ResponseEntity<?> updateInbox(int id, InboxDTO inbox);
 
 	// delete a inbox
-	void delteInboxById(int id, InboxDTO inboxDTO);
+	ResponseEntity<?> delteInboxById(int id, InboxDTO inboxDTO);
 
 	// delete all inbox
-	void deleteAllInbox(InboxDTO inboxDTO);
+	ResponseEntity<?> deleteAllInbox(InboxDTO inboxDTO);
 }

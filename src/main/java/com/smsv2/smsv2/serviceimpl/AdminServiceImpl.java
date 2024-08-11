@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,21 +31,22 @@ public class AdminServiceImpl implements AdminService {
 	private UserDao userdao;
 
 	@Override
-	public List<Admin> getAllAdmin() {
-		return admindao.findAll();
+	public ResponseEntity<List<Admin>> getAllAdmin() {
+		List<Admin> admin= admindao.findAll();
+		return new ResponseEntity<>(admin,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Admin> getAllAdminById(int id) {
+	public ResponseEntity<Optional<Admin>> getAllAdminById(int id) {
 		Optional<Admin> admin = admindao.findById(id);
 		if (admin.isPresent())
-			return admin;
+			return new ResponseEntity<>(admin,HttpStatus.OK);
 		else
 			throw new ResourceNotFoundException("admin", "id", id);
 	}
 
 	@Override
-	public void addAdmin(AdminDTO adminDTO) {
+	public ResponseEntity<?> addAdmin(AdminDTO adminDTO) {
 		Admin checkadmin = admindao.findById(adminDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", adminDTO.getUserid()));
 		Optional<User> emailAdmin=userdao.findByEmail(adminDTO.getEmail());
@@ -68,6 +71,7 @@ public class AdminServiceImpl implements AdminService {
 			admin.setPhone(adminDTO.getPhone());
 			admin.setPhoneverified(true);
 			admindao.save(admin);
+			return new ResponseEntity<>(HttpStatus.CREATED);
 		} else {
 			throw new ResourceBadRequestException("you are not admin");
 		}
@@ -75,7 +79,7 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public void updateAdmin(int id, AdminDTO adminDTO) {
+	public ResponseEntity<?> updateAdmin(int id, AdminDTO adminDTO) {
 		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
 		Optional<User> emailAdmin=userdao.findByEmail(adminDTO.getEmail());
 		Optional<User> phoneAdmin=userdao.findByPhone(adminDTO.getPhone());
@@ -96,6 +100,7 @@ public class AdminServiceImpl implements AdminService {
 			admin.setPhone(adminDTO.getPhone());
 			admin.setPhoneverified(true);
 			admindao.save(admin);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -103,25 +108,27 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
 			admin.setPic(file.getBytes());
 			admindao.save(admin);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}
 	}
 
 	@Override
-	public byte[] downloadFile(int id) {
+	public ResponseEntity<byte[]> downloadFile(int id) {
 		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
-		return admin.getPic();
+		byte[] pic= admin.getPic();
+		return new ResponseEntity<>(pic,HttpStatus.OK);
 	}
 
 	@Override
-	public void delteAdminById(int id, AdminDTO adminDTO) {
+	public ResponseEntity<?> delteAdminById(int id, AdminDTO adminDTO) {
 		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
 		if (id == adminDTO.getUserid()) {
 			BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
@@ -129,6 +136,7 @@ public class AdminServiceImpl implements AdminService {
 				admin.getFeedback().forEach(feedback -> feedback.setUser(null));
 				admin.getFeedback().clear();
 				admindao.delete(admin);
+				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
 				throw new ResourceBadRequestException("use valid password");
 

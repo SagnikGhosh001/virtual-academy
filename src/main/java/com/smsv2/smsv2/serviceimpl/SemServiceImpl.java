@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.smsv2.smsv2.DTO.SemDTO;
@@ -54,42 +56,46 @@ public class SemServiceImpl implements SemService {
 	private EntityManager entityManager;
 
 	@Override
-	public List<Sem> getAllSem() {
-		return semdao.findAll();
+	public ResponseEntity<List<Sem>> getAllSem() {
+		List<Sem>sem= semdao.findAll();
+		return new ResponseEntity<>(sem,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Sem> getAllSemById(int id) {
+	public ResponseEntity<Optional<Sem>> getAllSemById(int id) {
 		Optional<Sem> sem = semdao.findById(id);
 		if (sem.isEmpty()) {
 			throw new ResourceNotFoundException("sem", "id", id);
 		}
-		return sem;
+		return new ResponseEntity<>(sem,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Sem> getAllSemByTeacherId(int teacherId) {
-		return semdao.findByTeacherId(teacherId);
+	public ResponseEntity<List<Sem>> getAllSemByTeacherId(int teacherId) {
+		List<Sem>sem= semdao.findByTeacherId(teacherId);
+		return new ResponseEntity<>(sem,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Sem> getAllSemBydeptId(int deptId) {
-		return semdao.findByDeptId(deptId);
+	public ResponseEntity<List<Sem>> getAllSemBydeptId(int deptId) {
+		List<Sem> sem= semdao.findByDeptId(deptId);
+		return new ResponseEntity<>(sem,HttpStatus.OK);
 	}
 
 	@Override
-	public void addSem(SemDTO semDTO) {
+	public ResponseEntity<?> addSem(SemDTO semDTO) {
 		Optional<Teacher> teacher = teacherDao.findById(semDTO.getUserid());
 		Optional<Admin> admin = adminDao.findById(semDTO.getUserid());
-		Sem nameSem=semdao.findBySemname(semDTO.getSemname());
-		if(nameSem!=null) {
-			throw new ResourceInternalServerErrorException("sem","name",nameSem.getSemname());
+		Sem nameSem = semdao.findBySemname(semDTO.getSemname());
+		if (nameSem != null) {
+			throw new ResourceInternalServerErrorException("sem", "name", nameSem.getSemname());
 		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
 			Sem sem = new Sem();
 			sem.setSemname(semDTO.getSemname());
 			semdao.save(sem);
+			return new ResponseEntity<>(sem,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -97,18 +103,19 @@ public class SemServiceImpl implements SemService {
 	}
 
 	@Override
-	public void updateSem(int id, SemDTO semDTO) {
+	public ResponseEntity<?> updateSem(int id, SemDTO semDTO) {
 		Sem existSem = semdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("sem", "id", id));
 		Optional<Teacher> teacher = teacherDao.findById(semDTO.getUserid());
 		Optional<Admin> admin = adminDao.findById(semDTO.getUserid());
-		Sem nameSem=semdao.findBySemname(semDTO.getSemname());
-		if(nameSem!=null) {
-			throw new ResourceInternalServerErrorException("sem","name",nameSem.getSemname());
+		Sem nameSem = semdao.findBySemname(semDTO.getSemname());
+		if (nameSem != null) {
+			throw new ResourceInternalServerErrorException("sem", "name", nameSem.getSemname());
 		}
 		if ((teacher.isPresent() && teacher.get().getRole().equals("pic"))
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
 			existSem.setSemname(semDTO.getSemname());
 			semdao.save(existSem);
+			return new ResponseEntity<>(existSem,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -116,7 +123,7 @@ public class SemServiceImpl implements SemService {
 	}
 
 	@Override
-	public void delteSemById(int id, SemDTO semDTO) {
+	public ResponseEntity<?> delteSemById(int id, SemDTO semDTO) {
 		Sem existSem = semdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("sem", "id", id));
 		Optional<Teacher> checkteacher = teacherDao.findById(semDTO.getUserid());
 		Optional<Admin> admin = adminDao.findById(semDTO.getUserid());
@@ -135,6 +142,7 @@ public class SemServiceImpl implements SemService {
 			}
 			existSem.getStudent().clear();
 			semdao.delete(existSem);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -142,7 +150,7 @@ public class SemServiceImpl implements SemService {
 	}
 
 	@Override
-	public void deleteAllSem(SemDTO semDTO) {
+	public ResponseEntity<?> deleteAllSem(SemDTO semDTO) {
 		// Fetch all semesters from the database
 		List<Sem> semesters = semdao.findAll();
 
@@ -168,7 +176,7 @@ public class SemServiceImpl implements SemService {
 
 			// Delete all semesters from the database
 			semdao.deleteAll();
-
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}

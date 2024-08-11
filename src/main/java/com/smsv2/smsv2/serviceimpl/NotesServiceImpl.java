@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,28 +39,30 @@ public class NotesServiceImpl implements NotesService {
 	private AdminDao admindao;
 
 	@Override
-	public List<Notes> getAllNotes() {
+	public ResponseEntity<List<Notes>> getAllNotes() {
 
-		return notesdao.findAll();
+		List<Notes>notes= notesdao.findAll();
+		return new ResponseEntity<>(notes,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Notes> getNotesById(int id) {
+	public ResponseEntity<Optional<Notes>> getNotesById(int id) {
 		Optional<Notes> notesOptional = notesdao.findById(id);
 		if (notesOptional.isEmpty()) {
 			throw new ResourceNotFoundException("notes", "id", id);
 		}
-		return notesOptional;
+		return new ResponseEntity<>(notesOptional,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Notes> getNotesBySubId(int id) {
+	public ResponseEntity<List<Notes>> getNotesBySubId(int id) {
 
-		return notesdao.findBySubId(id);
+		List<Notes>notes= notesdao.findBySubId(id);
+		return new ResponseEntity<>(notes,HttpStatus.OK);
 	}
 
 	@Override
-	public void addNotes(NotesDTO notesDTO) {
+	public ResponseEntity<?> addNotes(NotesDTO notesDTO) {
 		Sub sub = subdao.findById(notesDTO.getSubId())
 				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", notesDTO.getSubId()));
 		Admin admin = admindao.findById(notesDTO.getUserid())
@@ -72,6 +76,7 @@ public class NotesServiceImpl implements NotesService {
 			notes.setSubname(sub.getSubname());
 			notes.setSemname(sub.getSem().getSemname());
 			notesdao.save(notes);
+			return new ResponseEntity<>(notes,HttpStatus.CREATED);
 		} else {
 			throw new ResourceBadRequestException("your role should be admin");
 		}
@@ -79,7 +84,7 @@ public class NotesServiceImpl implements NotesService {
 	}
 
 	@Override
-	public void updateNotes(int id, NotesDTO notesDTO) {
+	public ResponseEntity<?> updateNotes(int id, NotesDTO notesDTO) {
 		Admin admin = admindao.findById(notesDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", notesDTO.getUserid()));
 		if (admin.getRole().equals("admin")) {
@@ -87,6 +92,7 @@ public class NotesServiceImpl implements NotesService {
 			notes.setLink(notesDTO.getLink());
 			notes.setName(notesDTO.getName());
 			notesdao.save(notes);
+			return new ResponseEntity<>(notes,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be admin");
 		}
@@ -94,11 +100,12 @@ public class NotesServiceImpl implements NotesService {
 	}
 
 	@Override
-	public void deleteNotesByid(int id, NotesDTO notesDTO) {
+	public ResponseEntity<?> deleteNotesByid(int id, NotesDTO notesDTO) {
 		Admin admin = admindao.findById(notesDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", notesDTO.getUserid()));
 		if (admin.getRole().equals("admin")) {
 			notesdao.deleteById(id);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be admin");
 		}
@@ -106,11 +113,12 @@ public class NotesServiceImpl implements NotesService {
 	}
 
 	@Override
-	public void deleteAllNotes(NotesDTO notesDTO) {
+	public ResponseEntity<?> deleteAllNotes(NotesDTO notesDTO) {
 		Admin admin = admindao.findById(notesDTO.getUserid())
 				.orElseThrow(() -> new ResourceNotFoundException("admin", "id", notesDTO.getUserid()));
 		if (admin.getRole().equals("admin")) {
 			notesdao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be admin");
 		}
@@ -118,12 +126,13 @@ public class NotesServiceImpl implements NotesService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Notes notes = notesdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("notes", "id", id));
 			notes.setPdf(file.getBytes()); // Assuming 'pdf' field can hold PDF bytes
 			notesdao.save(notes);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}
@@ -133,6 +142,7 @@ public class NotesServiceImpl implements NotesService {
 	public byte[] downloadFile(int id) {
 		Notes notes = notesdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("notes", "id", id));
 		return notes.getPdf();
+
 	}
 
 }

@@ -63,7 +63,8 @@ public class TopicController {
 	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable int id,
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("teacher") || role.equals("hod") || role.equals("pic") ) {
-			String message = topicService.uploadFile(id, file);
+			ResponseEntity<String> responseEntity = topicService.uploadFile(id, file);
+			String message = responseEntity.getBody();
 			return ResponseEntity.status(HttpStatus.OK).body(message);
 		} else {
 			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);

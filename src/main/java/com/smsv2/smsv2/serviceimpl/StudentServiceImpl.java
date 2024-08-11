@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,67 +52,80 @@ public class StudentServiceImpl implements StudentService {
 	private EmailService studentemailservice;
 
 	@Override
-	public List<Student> getAllStudent() {
-		return studentdao.findAll();
+	public ResponseEntity<List<Student>> getAllStudent() {
+		List<Student>student= studentdao.findAll();
+		return new ResponseEntity<>(student,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Student> getAllStudentById(int id) {
+	public ResponseEntity<Optional<Student>> getAllStudentById(int id) {
 		Optional<Student> studentOptional = studentdao.findById(id);
 		if (studentOptional.isEmpty()) {
 			throw new ResourceNotFoundException("student", "id", id);
 		}
-		return studentOptional;
+		return new ResponseEntity<>(studentOptional,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Student> getAllStudentByEmail(String email) {
-		studentdao.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("student", "email", email));
-		return studentdao.findByEmail(email);
+	public ResponseEntity<Optional<Student>> getAllStudentByEmail(String email) {
+		Optional<Student> student = studentdao.findByReg(email);
+		if (student.isEmpty()) {
+			throw new ResourceNotFoundException("student", "email", email);
+		}
+		return new ResponseEntity<>(student,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Student> getAllStudentByPhone(String phone) {
-		studentdao.findByPhone(phone).orElseThrow(() -> new ResourceNotFoundException("student", "phone", phone));
-		return studentdao.findByEmail(phone);
+	public ResponseEntity<Optional<Student>> getAllStudentByPhone(String phone) {
+		Optional<Student> student = studentdao.findByReg(phone);
+		if (student.isEmpty()) {
+			throw new ResourceNotFoundException("student", "phone", phone);
+		}
+		return new ResponseEntity<>(student,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Student> getAllStudentByReg(String reg) {
-		studentdao.findByReg(reg).orElseThrow(() -> new ResourceNotFoundException("student", "reg", reg));
-		return studentdao.findByReg(reg);
+	public ResponseEntity<Optional<Student>> getAllStudentByReg(String reg) {
+		Optional<Student> student = studentdao.findByReg(reg);
+		if (student.isEmpty()) {
+			throw new ResourceNotFoundException("student", "reg", reg);
+		}
+		return new ResponseEntity<>(student,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Student> getAllStudentByDept(int deptId) {
-		return studentdao.findByDeptId(deptId);
+	public ResponseEntity<List<Student>> getAllStudentByDept(int deptId) {
+		List<Student>student= studentdao.findByDeptId(deptId);
+		return new ResponseEntity<>(student,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Student> getAllStudentBySem(int semId) {
-		return studentdao.findBySemId(semId);
+	public ResponseEntity<List<Student>> getAllStudentBySem(int semId) {
+		List<Student> student= studentdao.findBySemId(semId);
+		return new ResponseEntity<>(student,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Student> getAllStudentBySemandDept(int semId, int deptId) {
-		return studentdao.getByDeptandSem(semId, deptId);
+	public ResponseEntity<List<Student>> getAllStudentBySemandDept(int semId, int deptId) {
+		List<Student> student= studentdao.getByDeptandSem(semId, deptId);
+		return new ResponseEntity<>(student,HttpStatus.OK);
 
 	}
 
 	@Override
-	public List<Student> getAllStudentByEmailVerify(boolean emailVerify) {
+	public ResponseEntity<List<Student>> getAllStudentByEmailVerify(boolean emailVerify) {
 		return null;
 
 	}
 
 	@Override
-	public List<Student> getAllStudentByPhoneVerify(boolean phoneVerify) {
+	public ResponseEntity<List<Student>> getAllStudentByPhoneVerify(boolean phoneVerify) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void addStudent(StudentDTO studentDTO) {
+	public ResponseEntity<?> addStudent(StudentDTO studentDTO) {
 		Sem sem = semdao.findById(studentDTO.getSemId())
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", studentDTO.getSemId()));
 		Dept dept = deptdao.findById(studentDTO.getDeptId())
@@ -142,16 +157,18 @@ public class StudentServiceImpl implements StudentService {
 				+ "Click the link below to verify:\n" + verificationUrl;
 		studentemailservice.sendVerficationEmail1(studentDTO.getEmail(), verificationMsg);
 		studentdao.save(student);
+		return new ResponseEntity<>(student,HttpStatus.OK);
 	}
 
 	@Override
-	public void updateStudent(int id, StudentDTO studentDTO) {
+	public ResponseEntity<?> updateStudent(int id, StudentDTO studentDTO) {
 		Student existStudent = studentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("student", "id", id));
 		if (existStudent.getId() == studentDTO.getUserId()) {
 			existStudent.setGender(studentDTO.getGender());
 			existStudent.setName(studentDTO.getName());
 			studentdao.save(existStudent);
+			return new ResponseEntity<>(existStudent,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("You are not allowed");
 		}
@@ -159,7 +176,7 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public void updateStudentOthers(int id, StudentDTO studentDTO) {
+	public ResponseEntity<?> updateStudentOthers(int id, StudentDTO studentDTO) {
 		Student existStudent = studentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("student", "id", id));
 		Teacher teacher = teacherdao.findById(studentDTO.getUserId())
@@ -177,6 +194,7 @@ public class StudentServiceImpl implements StudentService {
 			existStudent.setDeptname(dept.getDeptname());
 			existStudent.setSemname(sem.getSemname());
 			studentdao.save(existStudent);
+			return new ResponseEntity<>(existStudent,HttpStatus.OK);
 		}else {
 			throw new ResourceBadRequestException("your role is "+teacher.getRole()+" you are not allowed only HOD and PIC is allowed");
 		}
@@ -184,7 +202,7 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public void delteStudentById(int id, StudentDTO studentDTO) {
+	public ResponseEntity<?> delteStudentById(int id, StudentDTO studentDTO) {
 		Student existStudent = studentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("student", "id", id));
 		Teacher teacher = teacherdao.findById(studentDTO.getUserId())
@@ -195,6 +213,7 @@ public class StudentServiceImpl implements StudentService {
 			existStudent.getFeedback().forEach(feedback -> feedback.setUser(null));
 			existStudent.getFeedback().clear();
 			studentdao.delete(existStudent);
+			return new ResponseEntity<>(HttpStatus.OK);
 		}else {
 			throw new ResourceBadRequestException("your role is "+teacher.getRole()+" you are not allowed only HOD and PIC is allowed");
 		}
@@ -202,7 +221,7 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public void deleteAllStudent(StudentDTO studentDTO) {
+	public ResponseEntity<?> deleteAllStudent(StudentDTO studentDTO) {
 
 		Teacher teacher = teacherdao.findById(studentDTO.getUserId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", studentDTO.getUserId()));
@@ -221,6 +240,7 @@ public class StudentServiceImpl implements StudentService {
 
 			// Delete all students from the database
 			studentdao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		}  else {
 			throw new ResourceBadRequestException("your are not pic");
 		}
@@ -228,13 +248,14 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Student student = studentdao.findById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("student", "id", id));
 			student.setPic(file.getBytes());
 			studentdao.save(student);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}
@@ -245,6 +266,7 @@ public class StudentServiceImpl implements StudentService {
 		Student student = studentdao.findById(studentId)
 				.orElseThrow(() -> new ResourceNotFoundException("student", "id", studentId));
 		return student.getPic();
+
 	}
 
 }

@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,16 +35,18 @@ public class FeedbackSeviceImpl implements FeedbackService {
 	
 	
 	@Override
-	public List<Feedback> getAllFeedback() {
+	public ResponseEntity<List<Feedback>> getAllFeedback() {
 
-		return feedbackdao.findAll();
+		List<Feedback> feedback= feedbackdao.findAll();
+		return new ResponseEntity<>(feedback,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Feedback> getFeedbackById(int id) {
+	public ResponseEntity<Optional<Feedback>> getFeedbackById(int id) {
 	    Optional<Feedback> feedbackOpt = feedbackdao.findById(id);
 	    if (feedbackOpt.isPresent()) {
-	        return feedbackOpt;
+	    	return new ResponseEntity<>(feedbackOpt,HttpStatus.OK);
+	        
 	    } else {
 	        throw new ResourceNotFoundException("feedback","id",id);
 	    }
@@ -50,7 +54,7 @@ public class FeedbackSeviceImpl implements FeedbackService {
 
 
 	@Override
-	public void addFeedback(FeedbackDTO feedbackDTO) {
+	public ResponseEntity<?> addFeedback(FeedbackDTO feedbackDTO) {
 		User user = userdao.findByEmail(feedbackDTO.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("user","email",feedbackDTO.getEmail()));
 		Feedback feedback = new Feedback();
@@ -59,16 +63,17 @@ public class FeedbackSeviceImpl implements FeedbackService {
 		feedback.setRating(feedbackDTO.getRating());
 		feedback.setEmailId(user.getEmail());
 		feedbackdao.save(feedback);
-
+		return new ResponseEntity<>(feedback,HttpStatus.CREATED);
 	}
 
 	@Override
-	public void updateFeedback(int id, FeedbackDTO feedbackDTO) {
+	public ResponseEntity<?> updateFeedback(int id, FeedbackDTO feedbackDTO) {
 		Feedback feedback = feedbackdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("feedback","id",id));
 		if (feedback.getUser().getEmail() == feedbackDTO.getEmail()) {
 			feedback.setMsg(feedbackDTO.getMsg());
 			feedback.setRating(feedbackDTO.getRating());
 			feedbackdao.save(feedback);
+			return new ResponseEntity<>(feedback,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed");
 		}
@@ -78,11 +83,12 @@ public class FeedbackSeviceImpl implements FeedbackService {
 	
 
 	@Override
-	public void deleteFeedbackById(int id,FeedbackDTO feedbackDTO) {
+	public ResponseEntity<?> deleteFeedbackById(int id,FeedbackDTO feedbackDTO) {
 		Feedback feedback = feedbackdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("feedback","id",id));
 		Optional<Admin> admin=admindao.findByEmail(feedbackDTO.getEmail());
 		if (feedback.getUser().getEmail() == feedbackDTO.getEmail() || (admin.isPresent()&&admin.get().getRole().equals("admin"))) {
 			feedbackdao.deleteById(id);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed");
 		}
@@ -90,10 +96,11 @@ public class FeedbackSeviceImpl implements FeedbackService {
 	}
 
 	@Override
-	public void deleteAllFeedback(FeedbackDTO feedbackDTO) {
+	public ResponseEntity<?> deleteAllFeedback(FeedbackDTO feedbackDTO) {
 		Optional<Admin> admin=admindao.findByEmail(feedbackDTO.getEmail());
 		if(admin.isPresent()&&admin.get().getRole().equals("admin")) {
 			feedbackdao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		}else {
 			throw new ResourceBadRequestException("you are not admin");
 			

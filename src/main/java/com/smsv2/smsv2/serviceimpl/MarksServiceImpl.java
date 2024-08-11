@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,33 +50,34 @@ public class MarksServiceImpl implements MarksService {
 	private TeacherDao teacherDao;
 
 	@Override
-	public List<Marks> getAllMarks() {
-		return marksDao.findAll();
-
+	public ResponseEntity<List<Marks>> getAllMarks() {
+		List<Marks> marks= marksDao.findAll();
+		return new ResponseEntity<>(marks,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Marks> getAllMarksById(int id) {
+	public ResponseEntity<Optional<Marks>> getAllMarksById(int id) {
 		Optional<Marks> marksOptional = marksDao.findById(id);
 		if (marksOptional.isEmpty()) {
 			throw new ResourceNotFoundException("marks", "id", id);
 		}
-		return marksOptional;
+		return new ResponseEntity<>(marksOptional,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Marks> getAllMarksByReg(String reg) {
-		return marksDao.findByReg_Reg(reg);
+	public ResponseEntity<List<Marks>> getAllMarksByReg(String reg) {
+		List<Marks> marks= marksDao.findByReg_Reg(reg);
+		return new ResponseEntity<>(marks,HttpStatus.OK);
 	}
 	
 	@Override
-	public List<Marks> getAllMarksByRegSem(MarksDTO marksDTO) {
-		return  marksDao.findByReg_RegAndSemname(marksDTO.getReg(),marksDTO.getSemname());
-	
+	public ResponseEntity<List<Marks>> getAllMarksByRegSem(MarksDTO marksDTO) {
+		List<Marks> marks=  marksDao.findByReg_RegAndSemname(marksDTO.getReg(),marksDTO.getSemname());
+		return new ResponseEntity<>(marks,HttpStatus.OK);
 	}
 
 	@Override
-	public void addMarks(MarksDTO marksDTO) {
+	public ResponseEntity<?> addMarks(MarksDTO marksDTO) {
 		Student student = studentDao.findByReg(marksDTO.getReg())
 				.orElseThrow(() -> new ResourceNotFoundException("student", "id", marksDTO.getReg()));
 		Sub sub = subDao.findById(marksDTO.getSubId())
@@ -94,6 +97,7 @@ public class MarksServiceImpl implements MarksService {
 			marks.setRegNo(student.getReg());
 			marks.setSubname(sub.getSubname());
 			marksDao.save(marks);
+			return new ResponseEntity<>(marks,HttpStatus.CREATED);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -101,7 +105,7 @@ public class MarksServiceImpl implements MarksService {
 	}
 
 	@Override
-	public void updateMarkbyId(int id, MarksDTO marks) {
+	public ResponseEntity<?> updateMarkbyId(int id, MarksDTO marks) {
 		Marks existMarks = marksDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("marks", "id", id));
 		Teacher teacher = teacherDao.findById(marks.getTeacher())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", marks.getTeacher()));
@@ -116,7 +120,7 @@ public class MarksServiceImpl implements MarksService {
 			existMarks.setDeptName(sub.getDept().getDeptname());
 			existMarks.setSemname(sub.getSem().getSemname());
 			marksDao.save(existMarks);
-
+			return new ResponseEntity<>(existMarks,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -124,13 +128,14 @@ public class MarksServiceImpl implements MarksService {
 	}
 
 	@Override
-	public void delteMarksById(int id, MarksDTO marksDTO) {
+	public ResponseEntity<?> delteMarksById(int id, MarksDTO marksDTO) {
 		Marks existMarks = marksDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("marks", "id", id));
 		Teacher teacher = teacherDao.findById(marksDTO.getTeacher())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", marksDTO.getTeacher()));
 		if (teacher.getDept().equals(existMarks.getReg().getDept())
 				&& teacher.getSem().contains(existMarks.getSub().getSem())) {
 			marksDao.delete(existMarks);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -138,12 +143,13 @@ public class MarksServiceImpl implements MarksService {
 	}
 
 	@Override
-	public void deleteAllMarks(MarksDTO marksDTO) {
+	public ResponseEntity<?> deleteAllMarks(MarksDTO marksDTO) {
 		Teacher teacher = teacherDao.findById(marksDTO.getTeacher())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", marksDTO.getTeacher()));
 
 		if (teacher.getRole().equals("pic")) {
 			marksDao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic");
 		}

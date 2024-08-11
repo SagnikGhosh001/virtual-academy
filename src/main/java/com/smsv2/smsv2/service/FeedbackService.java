@@ -3,20 +3,22 @@ package com.smsv2.smsv2.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
+
 import com.smsv2.smsv2.DTO.AssignmentDTO;
 import com.smsv2.smsv2.DTO.FeedbackDTO;
 import com.smsv2.smsv2.entity.Feedback;
 
 public interface FeedbackService {
-	List<Feedback> getAllFeedback();
+	ResponseEntity<List<Feedback>> getAllFeedback();
 
-	Optional<Feedback> getFeedbackById(int id);
+	ResponseEntity<Optional<Feedback>> getFeedbackById(int id);
 
-	void addFeedback(FeedbackDTO feedbackDTO);
+	ResponseEntity<?> addFeedback(FeedbackDTO feedbackDTO);
 
-	void updateFeedback(int id, FeedbackDTO feedbackDTO);
+	ResponseEntity<?> updateFeedback(int id, FeedbackDTO feedbackDTO);
 
-	void deleteFeedbackById(int id, FeedbackDTO feedbackDTO);
+	ResponseEntity<?> deleteFeedbackById(int id, FeedbackDTO feedbackDTO);
 
-	void deleteAllFeedback(FeedbackDTO feedbackDTO);
+	ResponseEntity<?> deleteAllFeedback(FeedbackDTO feedbackDTO);
 }

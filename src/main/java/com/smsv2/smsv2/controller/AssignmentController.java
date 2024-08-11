@@ -48,14 +48,16 @@ public class AssignmentController {
 
 	@PostMapping("/uploadpdf/{id}/{role}")
 	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable("id") int id,
-			@RequestParam("file") MultipartFile file) {
-		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			String message = assignmentservice.uploadFile(id, file);
-			return ResponseEntity.status(HttpStatus.OK).body(message);
-		} else {
-			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);
-		}
+	                                        @RequestParam("file") MultipartFile file) {
+	    if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
+	        ResponseEntity<String> responseEntity = assignmentservice.uploadFile(id, file);
+	        String message = responseEntity.getBody(); 
+	        return ResponseEntity.status(responseEntity.getStatusCode()).body(message);
+	    } else {
+	        return new ResponseEntity<>("You are not allowed to perform this action", HttpStatus.BAD_REQUEST);
+	    }
 	}
+
 
 	@GetMapping("/downloadpdf/{id}")
 	public ResponseEntity<byte[]> downloadPdf(@PathVariable("id") int id) {

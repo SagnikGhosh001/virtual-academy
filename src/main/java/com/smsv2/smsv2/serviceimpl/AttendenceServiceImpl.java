@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,28 +35,30 @@ public class AttendenceServiceImpl implements AttendenceService {
 	private TeacherDao teacherdao;
 
 	@Override
-	public List<Attendence> getAllAttendence() {
-		return attendencedao.findAll();
+	public ResponseEntity<List<Attendence>> getAllAttendence() {
+		List<Attendence> attendence= attendencedao.findAll();
+		return new ResponseEntity<>(attendence,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Attendence> getAllAttendenceById(int id) {
+	public ResponseEntity<Optional<Attendence>> getAllAttendenceById(int id) {
 		Optional<Attendence> attendence = attendencedao.findById(id);
 		if (attendence.isEmpty()) {
 			throw new ResourceNotFoundException("attendence", "id", id);
 		}
-		return attendence;
+		return new ResponseEntity<>(attendence,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Attendence> getAllAttendenceBySubId(int subId) {
+	public ResponseEntity<List<Attendence>> getAllAttendenceBySubId(int subId) {
 
-		return attendencedao.findBySubid_Id(subId);
+		List<Attendence> attendence= attendencedao.findBySubid_Id(subId);
+		return new ResponseEntity<>(attendence,HttpStatus.OK);
 
 	}
 
 	@Override
-	public void addAssignment(AttendenceDTO attendenceDTO) {
+	public ResponseEntity<?> addAssignment(AttendenceDTO attendenceDTO) {
 		Sub sub = subdao.findById(attendenceDTO.getSubId())
 				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", attendenceDTO.getSubId()));
 		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
@@ -73,6 +77,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 			attendence.setTeachername(sub.getTeacher().getName());
 			attendence.setSubname(sub.getSubname());
 			attendencedao.save(attendence);
+			return new ResponseEntity<>(attendence,HttpStatus.CREATED);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -80,7 +85,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 	}
 
 	@Override
-	public void updateAttendence(int id, AttendenceDTO attendenceDTO) {
+	public ResponseEntity<?> updateAttendence(int id, AttendenceDTO attendenceDTO) {
 
 		Attendence existAttendence = attendencedao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
@@ -94,6 +99,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 			existAttendence.setName(attendenceDTO.getName());
 			existAttendence.setLink(attendenceDTO.getLink());
 			attendencedao.save(existAttendence);
+			return new ResponseEntity<>(existAttendence,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -101,13 +107,14 @@ public class AttendenceServiceImpl implements AttendenceService {
 	}
 
 	@Override
-	public void delteAttendenceById(int id, AttendenceDTO attendenceDTO) {
+	public ResponseEntity<?> delteAttendenceById(int id, AttendenceDTO attendenceDTO) {
 		Attendence existAttendence = attendencedao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
 		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		if (existAttendence.getSubid().getTeacher().getId() == attendenceDTO.getTeacherId()) {
 			attendencedao.delete(existAttendence);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -115,11 +122,12 @@ public class AttendenceServiceImpl implements AttendenceService {
 	}
 
 	@Override
-	public void deleteAllAttendence(AttendenceDTO attendenceDTO) {
+	public ResponseEntity<?> deleteAllAttendence(AttendenceDTO attendenceDTO) {
 		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		if (teacher.getRole().equals("pic")) {
 			attendencedao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic ");
 		}
@@ -127,7 +135,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 	}
 
 	@Override
-	public void deleteAllAttendenceSub(int subId,AttendenceDTO attendenceDTO) {
+	public ResponseEntity<?> deleteAllAttendenceSub(int subId,AttendenceDTO attendenceDTO) {
 		Teacher teacher = teacherdao.findById(attendenceDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", attendenceDTO.getTeacherId()));
 		Sub sub = subdao.findById(subId)
@@ -135,6 +143,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 		if (teacher.getSub().contains(sub)) {
 			List<Attendence> existAttendence = attendencedao.findBySubid_Id(subId);
 			attendencedao.deleteAll(existAttendence);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 
@@ -143,13 +152,14 @@ public class AttendenceServiceImpl implements AttendenceService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Attendence attendence = attendencedao.findById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
 			attendence.setPdf(file.getBytes()); // Assuming 'pdf' field can hold PDF bytes
 			attendencedao.save(attendence);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}
@@ -160,6 +170,7 @@ public class AttendenceServiceImpl implements AttendenceService {
 		Attendence attendence = attendencedao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("attendence", "id", id));
 		return attendence.getPdf();
+		
 	}
 
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,60 +52,70 @@ public class TeacherServiceImpl implements TeacherService {
 	private PhoneService teacherphoneservice;
 
 	@Override
-	public List<Teacher> getAllTeacher() {
-		return teacherdao.findAll();
+	public ResponseEntity<List<Teacher>> getAllTeacher() {
+		List<Teacher>teacher= teacherdao.findAll();
+		 return new ResponseEntity<>(teacher,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Teacher> getAllTeacherById(int id) {
+	public ResponseEntity<Optional<Teacher>> getAllTeacherById(int id) {
 		Optional<Teacher> teacherOptional = teacherdao.findById(id);
 		if (teacherOptional.isEmpty()) {
 			throw new ResourceNotFoundException("teacher", "id", id);
 		}
-		return teacherOptional;
+		 return new ResponseEntity<>(teacherOptional,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Teacher> getAllTeacherBySemId(int id) {
-		return teacherdao.findBySemId(id);
+	public ResponseEntity<List<Teacher>> getAllTeacherBySemId(int id) {
+		List<Teacher>teacher= teacherdao.findBySemId(id);
+		 return new ResponseEntity<>(teacher,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Teacher> getAllTeacherByDeptId(int id) {
-		return teacherdao.findByDeptId(id);
+	public ResponseEntity<List<Teacher>> getAllTeacherByDeptId(int id) {
+		List<Teacher>teacher= teacherdao.findByDeptId(id);
+		 return new ResponseEntity<>(teacher,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Teacher> getAllTeacherBySemDeptId(int semid, int deptid) {
-		return teacherdao.findBySemDeptId(semid, deptid);
+	public ResponseEntity<List<Teacher>> getAllTeacherBySemDeptId(int semid, int deptid) {
+		List<Teacher>teacher= teacherdao.findBySemDeptId(semid, deptid);
+		 return new ResponseEntity<>(teacher,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Teacher> getAllTeacherByEmail(String email) {
-		teacherdao.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("teacher", "email", email));
-		return teacherdao.findByEmail(email);
+	public ResponseEntity<Optional<Teacher>> getAllTeacherByEmail(String email) {
+		Optional<Teacher> teacher = teacherdao.findByPhone(email);
+		if (teacher.isEmpty()) {
+			throw new ResourceNotFoundException("teacher", "email", email);
+		}
+		 return new ResponseEntity<>(teacher,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Teacher> getAllTeacherByPhone(String phone) {
-		teacherdao.findByPhone(phone).orElseThrow(() -> new ResourceNotFoundException("teacher", "phone", phone));
-		return teacherdao.findByPhone(phone);
+	public ResponseEntity<Optional<Teacher>> getAllTeacherByPhone(String phone) {
+		Optional<Teacher> teacher = teacherdao.findByPhone(phone);
+		if (teacher.isEmpty()) {
+			throw new ResourceNotFoundException("teacher", "phone", phone);
+		}
+		 return new ResponseEntity<>(teacher,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Teacher> getAllTeacherByEmailVerify(boolean emailVerify) {
+	public ResponseEntity<Optional<Teacher>> getAllTeacherByEmailVerify(boolean emailVerify) {
 		// TODO Auto-generated method stub
-		return Optional.empty();
+		return null;
 	}
 
 	@Override
-	public Optional<Teacher> getAllTeacherByPhoneVerify(boolean phoneVerify) {
+	public ResponseEntity<Optional<Teacher>> getAllTeacherByPhoneVerify(boolean phoneVerify) {
 		// TODO Auto-generated method stub
-		return Optional.empty();
+		return null;
 	}
 
 	@Override
-	public void addTeacher(TeacherDTO teacherDTO) {
+	public ResponseEntity<?> addTeacher(TeacherDTO teacherDTO) {
 		Sem sem = semdao.findById(teacherDTO.getSemId())
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", teacherDTO.getSemId()));
 		Dept dept = deptdao.findById(teacherDTO.getDeptId())
@@ -134,6 +146,7 @@ public class TeacherServiceImpl implements TeacherService {
 					+ loginUrl;
 			teacheremailservice.sendVerficationEmail1(teacherDTO.getEmail(), verificationMsg);
 			teacherdao.save(teacher);
+			 return new ResponseEntity<>(teacher,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -141,13 +154,14 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public void updateTeacher(int id, TeacherDTO teacher) {
+	public ResponseEntity<?> updateTeacher(int id, TeacherDTO teacher) {
 		Teacher existTeacher = teacherdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", id));
 		if (id == teacher.getUserId()) {
 			existTeacher.setGender(teacher.getGender());
 			existTeacher.setName(teacher.getName());
 			teacherdao.save(existTeacher);
+			 return new ResponseEntity<>(existTeacher,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("You are not allowed");
 		}
@@ -155,7 +169,7 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public void updateTeacherOthers(int id, TeacherDTO teacherDTO) {
+	public ResponseEntity<?> updateTeacherOthers(int id, TeacherDTO teacherDTO) {
 		Teacher existTeacher = teacherdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", id));
 		Dept dept = deptdao.findById(teacherDTO.getDeptId())
@@ -173,6 +187,7 @@ public class TeacherServiceImpl implements TeacherService {
 				existTeacher.getSem().add(sem);
 			}
 			teacherdao.save(existTeacher);
+			 return new ResponseEntity<>(existTeacher,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -180,7 +195,7 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public void delteTeacherById(int id, TeacherDTO teacherDTO) {
+	public ResponseEntity<?> delteTeacherById(int id, TeacherDTO teacherDTO) {
 		Teacher existTeacher = teacherdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", id));
 		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
@@ -194,6 +209,7 @@ public class TeacherServiceImpl implements TeacherService {
 			existTeacher.getFeedback().forEach(feedback -> feedback.setUser(null));
 			existTeacher.getFeedback().clear();
 			teacherdao.delete(existTeacher);
+			 return new ResponseEntity<>(existTeacher,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -201,7 +217,7 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public void delteTeacherSemById(int id, TeacherDTO teacherDTO) {
+	public ResponseEntity<?> delteTeacherSemById(int id, TeacherDTO teacherDTO) {
 		Teacher teacher = teacherdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("teacher", "id", id));
 
 		Sem sem = semdao.findById(teacherDTO.getSemId())
@@ -219,6 +235,7 @@ public class TeacherServiceImpl implements TeacherService {
 			}
 
 			teacherdao.save(teacher);
+			 return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -226,7 +243,7 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public void delteTeacherDeptById(int id, TeacherDTO teacherDTO) {
+	public ResponseEntity<?> delteTeacherDeptById(int id, TeacherDTO teacherDTO) {
 		Dept dept = deptdao.findById(teacherDTO.getDeptId())
 				.orElseThrow(() -> new ResourceNotFoundException("dept", "id", teacherDTO.getDeptId()));
 
@@ -245,6 +262,7 @@ public class TeacherServiceImpl implements TeacherService {
 			}
 
 			teacherdao.save(teacher);
+			 return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -252,7 +270,7 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public void deleteAllTeacher(TeacherDTO teacherDTO) {
+	public ResponseEntity<?> deleteAllTeacher(TeacherDTO teacherDTO) {
 		// Fetch all teachers from the database
 		List<Teacher> teachers = teacherdao.findAll();
 		Optional<Teacher> checkteacher = teacherdao.findById(teacherDTO.getUserId());
@@ -277,6 +295,7 @@ public class TeacherServiceImpl implements TeacherService {
 
 			// Delete all teachers from the database
 			teacherdao.deleteAll();
+			 return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -284,13 +303,14 @@ public class TeacherServiceImpl implements TeacherService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Teacher teacher = teacherdao.findById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", id));
 			teacher.setPic(file.getBytes());
 			teacherdao.save(teacher);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			 return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.smsv2.smsv2.DTO.DeptDTO;
@@ -47,31 +49,34 @@ public class DeptServiceImpl implements DeptService {
 	private AdminDao adminDao;
 
 	@Override
-	public List<Dept> getAllDept() {
-		return deptDao.findAll();
+	public ResponseEntity<List<Dept>> getAllDept() {
+		List<Dept>dept= deptDao.findAll();
+		return new ResponseEntity<>(dept,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Dept> getAllDeptById(int id) {
+	public ResponseEntity<Optional<Dept>> getAllDeptById(int id) {
 		Optional<Dept> dept = deptDao.findById(id);
 		if (dept.isEmpty()) {
 			throw new ResourceNotFoundException("dept", "id", id);
 		}
-		return dept;
+		return new ResponseEntity<>(dept,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Dept> getAllDeptByTeacherId(int teacherId) {
-		return deptDao.findByTeacherId(teacherId);
+	public ResponseEntity<List<Dept>> getAllDeptByTeacherId(int teacherId) {
+		List<Dept> dept= deptDao.findByTeacherId(teacherId);
+		return new ResponseEntity<>(dept,HttpStatus.OK);
 	}
 
 	@Override
-	public List<Dept> getAllDeptBySemId(int semId) {
-		return deptDao.findBySemId(semId);
+	public ResponseEntity<List<Dept>> getAllDeptBySemId(int semId) {
+		List<Dept> dept= deptDao.findBySemId(semId);
+		return new ResponseEntity<>(dept,HttpStatus.OK);
 	}
 
 	@Override
-	public void addDept(DeptDTO deptDTO) {
+	public ResponseEntity<?> addDept(DeptDTO deptDTO) {
 		Sem sem = semDao.findById(deptDTO.getSemId())
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", deptDTO.getSemId()));
 
@@ -93,6 +98,7 @@ public class DeptServiceImpl implements DeptService {
 
 			}
 			deptDao.save(dept);
+			return new ResponseEntity<>(dept,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be  pic or admin");
 		}
@@ -100,7 +106,7 @@ public class DeptServiceImpl implements DeptService {
 	}
 
 	@Override
-	public void updateDept(int id, DeptDTO deptDTO) {
+	public ResponseEntity<?> updateDept(int id, DeptDTO deptDTO) {
 		Dept dept = deptDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("dept", "id", id));
 		Sem sem = semDao.findById(deptDTO.getSemId())
 				.orElseThrow(() -> new ResourceNotFoundException("sem", "id", deptDTO.getSemId()));
@@ -117,6 +123,7 @@ public class DeptServiceImpl implements DeptService {
 				dept.getSem().add(sem);
 			}
 			deptDao.save(dept);
+			return new ResponseEntity<>(dept,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -124,7 +131,7 @@ public class DeptServiceImpl implements DeptService {
 	}
 
 	@Override
-	public void delteDeptById(int id, DeptDTO deptDTO) {
+	public ResponseEntity<?> delteDeptById(int id, DeptDTO deptDTO) {
 		Dept dept = deptDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("dept", "id", id));
 		Optional<Teacher> checkteacher = teacherDao.findById(deptDTO.getUserid());
 		Optional<Admin> admin = adminDao.findById(deptDTO.getUserid());
@@ -144,6 +151,7 @@ public class DeptServiceImpl implements DeptService {
 
 			// Delete the department only once
 			deptDao.delete(dept);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -151,7 +159,7 @@ public class DeptServiceImpl implements DeptService {
 	}
 
 	@Override
-	public void delteDeptSemById(int id, DeptDTO deptDTO) {
+	public ResponseEntity<?> delteDeptSemById(int id, DeptDTO deptDTO) {
 		// Fetch the Dept entity from the database
 		Dept dept = deptDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("dept", "id", id));
 
@@ -174,6 +182,7 @@ public class DeptServiceImpl implements DeptService {
 
 			// Save the updated Dept entity
 			deptDao.save(dept);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}
@@ -181,7 +190,7 @@ public class DeptServiceImpl implements DeptService {
 	}
 
 	@Override
-	public void deleteAllDept(DeptDTO deptDTO) {
+	public ResponseEntity<?> deleteAllDept(DeptDTO deptDTO) {
 		// Fetch all departments from the database
 		List<Dept> depts = deptDao.findAll();
 
@@ -206,6 +215,7 @@ public class DeptServiceImpl implements DeptService {
 
 			// Delete all departments from the database
 			deptDao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");
 		}

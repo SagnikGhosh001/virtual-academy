@@ -75,7 +75,8 @@ public class StudentController {
 
 	@PostMapping("/uploadstudentpic/{studentId}")
 	public ResponseEntity<String> uploadFile(@PathVariable("studentId") int studentId, @RequestParam("file") MultipartFile file) {
-		String message = studentservice.uploadFile(studentId, file);
+		ResponseEntity<String> responseEntity= studentservice.uploadFile(studentId, file);
+		String message = responseEntity.getBody(); 
 		return ResponseEntity.status(HttpStatus.OK).body(message);
 	}
 

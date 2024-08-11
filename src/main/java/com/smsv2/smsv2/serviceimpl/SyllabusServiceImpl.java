@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,27 +37,29 @@ public class SyllabusServiceImpl implements SyllabusService {
 	private TeacherDao teacherdao;
 
 	@Override
-	public List<Syllabus> getAllSyllabus() {
-		return syllabusdao.findAll();
+	public ResponseEntity<List<Syllabus>> getAllSyllabus() {
+		List<Syllabus>syllabus= syllabusdao.findAll();
+		 return new ResponseEntity<>(syllabus,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Syllabus> getSyllabusById(int id) {
+	public ResponseEntity<Optional<Syllabus>> getSyllabusById(int id) {
 	    Optional<Syllabus> syllabusOptional = syllabusdao.findById(id);
 	    if (syllabusOptional.isEmpty()) {
 	        throw new ResourceNotFoundException("syllabus","id", id);
 	    }
-	    return syllabusOptional;
+	    return new ResponseEntity<>(syllabusOptional,HttpStatus.OK);
 	}
 
 
 	@Override
-	public List<Syllabus> getSyllabusByDeptId(int deptId) {
-		return syllabusdao.findByDeptId(deptId);
+	public ResponseEntity<List<Syllabus>> getSyllabusByDeptId(int deptId) {
+		List<Syllabus> syllabus= syllabusdao.findByDeptId(deptId);
+		   return new ResponseEntity<>(syllabus,HttpStatus.OK);
 	}
 
 	@Override
-	public void addSyllabus(SyllabusDTO syllabusDTO) {
+	public ResponseEntity<?> addSyllabus(SyllabusDTO syllabusDTO) {
 		Dept dept = deptdao.findById(syllabusDTO.getDept())
 				.orElseThrow(() -> new ResourceNotFoundException("dept","id", syllabusDTO.getDept()));
 		Teacher teacher = teacherdao.findById(syllabusDTO.getTeacherId())
@@ -70,6 +75,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 			syllabus.setName(syllabusDTO.getName());
 			syllabus.setDeptname(dept.getDeptname());
 			syllabusdao.save(syllabus);
+			   return new ResponseEntity<>(syllabus,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -77,7 +83,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 	}
 
 	@Override
-	public void updateSyllabus(int id, SyllabusDTO syllabusDTO) {
+	public ResponseEntity<?> updateSyllabus(int id, SyllabusDTO syllabusDTO) {
 		Syllabus syllabus = syllabusdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("syllabus","id", id));
 		Teacher teacher = teacherdao.findById(syllabusDTO.getTeacherId())
@@ -86,6 +92,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 			syllabus.setName(syllabusDTO.getName());
 			syllabus.setLink(syllabusDTO.getLink());
 			syllabusdao.save(syllabus);
+			   return new ResponseEntity<>(syllabus,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -95,7 +102,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 
 
 	@Override
-	public void deleteSyllabusById(int id, SyllabusDTO syllabusDTO) {
+	public ResponseEntity<?> deleteSyllabusById(int id, SyllabusDTO syllabusDTO) {
 		Syllabus syllabus = syllabusdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("syllabus","id", id));
 		Teacher teacher = teacherdao.findById(syllabusDTO.getTeacherId())
@@ -105,6 +112,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 	    }
 		if (teacher.getDept().getId() == syllabus.getDept().getId()) {
 			syllabusdao.delete(syllabus);
+			   return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -112,7 +120,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 	}
 
 	@Override
-	public void deleteSyllabusByDeptId(int deptId, SyllabusDTO syllabusDTO) {
+	public ResponseEntity<?> deleteSyllabusByDeptId(int deptId, SyllabusDTO syllabusDTO) {
 		List<Syllabus> syllabus = syllabusdao.findByDeptId(deptId);
 		Teacher teacher = teacherdao.findById(syllabusDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher","id", syllabusDTO.getTeacherId()));
@@ -121,6 +129,7 @@ public class SyllabusServiceImpl implements SyllabusService {
 	    }
 		if (teacher.getDept().getId()==deptId) {
 			syllabusdao.deleteAll(syllabus);
+			   return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -128,12 +137,13 @@ public class SyllabusServiceImpl implements SyllabusService {
 	}
 
 	@Override
-	public void deleteAllSyllabus(SyllabusDTO syllabusDTO) {
+	public ResponseEntity<?> deleteAllSyllabus(SyllabusDTO syllabusDTO) {
 		Teacher teacher = teacherdao.findById(syllabusDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher","id", syllabusDTO.getTeacherId()));
 		
 		if(teacher.getRole().equals("pic")) {
 			syllabusdao.deleteAll();
+			   return new ResponseEntity<>(HttpStatus.OK);
 		}else {
 			throw new ResourceBadRequestException("you are not pic");
 		}
@@ -142,13 +152,14 @@ public class SyllabusServiceImpl implements SyllabusService {
 	}
 	
 	@Override
-    public String uploadFile(int id, MultipartFile file) {
+    public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
         try {
             Syllabus syllabus = syllabusdao.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("syllabus","id", id));
             syllabus.setPdf(file.getBytes()); // Assuming 'pdf' field can hold PDF bytes
             syllabusdao.save(syllabus);
-            return "File uploaded successfully";
+            String msg= "File uploaded successfully";
+            return new ResponseEntity<>(msg,HttpStatus.OK);
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload file", e);
         }
@@ -159,6 +170,8 @@ public class SyllabusServiceImpl implements SyllabusService {
         Syllabus syllabus = syllabusdao.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("syllabus","id", id));
         return syllabus.getPdf();
+       
+        
     }
 
 }

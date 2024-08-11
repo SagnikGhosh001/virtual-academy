@@ -60,7 +60,8 @@ public class SyllabusController {
 	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable int id,
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
-			String message = syllabusservice.uploadFile(id, file);
+			ResponseEntity<String> responseEntity = syllabusservice.uploadFile(id, file);
+			String message = responseEntity.getBody(); 
 			return ResponseEntity.status(HttpStatus.OK).body(message);
 
 		} else {

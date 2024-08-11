@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +54,7 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	public LoginResponse login(UserDTO userDTO) {
+	public ResponseEntity<LoginResponse> login(UserDTO userDTO) {
 		User user = userdao.findByEmail(userDTO.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 
@@ -59,16 +62,16 @@ public class UserServiceImpl implements UserService {
 		if (user != null && user.isEmailVerified() && bcrypt.matches(userDTO.getPassword(), user.getPassword())) {
 			// Generate JWT token
 			String token = jwtUtil.generateToken(user.getEmail());
-
+			LoginResponse loginResponse = new LoginResponse(token, user);
 			// Return user and token
-			return new LoginResponse(token, user);
+			return new ResponseEntity<>(loginResponse,HttpStatus.OK) ;
 		} else {
 			throw new ResourceBadRequestException("Use valid email and password");
 		}
 	}
 
 	@Override
-	public void emailVerify(UserDTO userDTO) {
+	public ResponseEntity<?> emailVerify(UserDTO userDTO) {
 		User user = userdao.findByEmail(userDTO.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 
@@ -81,6 +84,7 @@ public class UserServiceImpl implements UserService {
 			user.setEmailVerified(true);
 			user.setIsemailOtpUsed(true);
 			userdao.save(user);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("invalid or used OTP or expire OTP");
 
@@ -89,7 +93,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void updateEmail(int id, UserDTO userDTO) {
+	public ResponseEntity<?> updateEmail(int id, UserDTO userDTO) {
 		User user = userdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
 		Optional<User> emailUser=userdao.findByEmail(userDTO.getEmail());
@@ -100,6 +104,7 @@ public class UserServiceImpl implements UserService {
 			user.setEmail(userDTO.getEmail());
 			user.setEmailVerified(false);
 			userdao.save(user);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed");
 
@@ -108,7 +113,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void addPhone(int id, UserDTO userDTO) {
+	public ResponseEntity<?> addPhone(int id, UserDTO userDTO) {
 		User user = userdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("user", "id", id));
 		Optional<User> emailUser=userdao.findByPhone(userDTO.getPhone());
@@ -123,6 +128,7 @@ public class UserServiceImpl implements UserService {
 			user.setExpiryDatePhoneOtp(LocalDateTime.now().plusMinutes(10));
 			user.setPhoneotp(otp);
 			userdao.save(user);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed");
 
@@ -131,7 +137,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void phoneVerify(UserDTO userDTO) {
+	public ResponseEntity<?> phoneVerify(UserDTO userDTO) {
 		User user = userdao.findByPhone(userDTO.getPhone())
 				.orElseThrow(() -> new ResourceNotFoundException("user", "phone", userDTO.getPhone()));
 		if (user == null) {
@@ -144,6 +150,7 @@ public class UserServiceImpl implements UserService {
 			user.setPhoneverified(true);
 			user.setPhoneOtpUsed(true);
 			userdao.save(user);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("internal error");
 
@@ -152,7 +159,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void sendOtpTOEmaail(UserDTO userDTO) {
+	public ResponseEntity<?> sendOtpTOEmaail(UserDTO userDTO) {
 		User user = userdao.findByEmail(userDTO.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 
@@ -162,11 +169,11 @@ public class UserServiceImpl implements UserService {
 		emailservice.sendVerficationEmail(userDTO.getEmail(), otp);
 		user.setIsemailOtpUsed(false);
 		userdao.save(user);
-
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@Override
-	public void updatePassword(int id, UserDTO userDTO) {
+	public ResponseEntity<?> updatePassword(int id, UserDTO userDTO) {
 		User user = userdao.findByEmail(userDTO.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 
@@ -175,6 +182,7 @@ public class UserServiceImpl implements UserService {
 			if (bcrypt.matches(userDTO.getPassword(), user.getPassword())) {
 				user.setPassword(bcrypt.encode(userDTO.getChangePassword()));
 				userdao.save(user);
+				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
 				throw new ResourceBadRequestException("use valid password");
 
@@ -187,7 +195,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void forgetPassword(UserDTO userDTO) {
+	public ResponseEntity<?> forgetPassword(UserDTO userDTO) {
 		User user = userdao.findByEmail(userDTO.getEmail())
 				.orElseThrow(() -> new ResourceNotFoundException("user", "email", userDTO.getEmail()));
 		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
@@ -197,6 +205,7 @@ public class UserServiceImpl implements UserService {
 			user.setPassword(bcrypt.encode(userDTO.getPassword()));
 			user.setIsemailOtpUsed(true);
 			userdao.save(user);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("invalid otp or expire otp or used Otp");
 

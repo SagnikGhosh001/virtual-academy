@@ -61,7 +61,8 @@ public class NotesController {
 	public ResponseEntity<String> uploadPdf(@PathVariable("role") String role, @PathVariable int id,
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("admin")) {
-			String message = notesservice.uploadFile(id, file);
+			ResponseEntity<String> responseEntity = notesservice.uploadFile(id, file);
+			String message = responseEntity.getBody(); 
 			return ResponseEntity.status(HttpStatus.OK).body(message);
 		} else {
 			return new ResponseEntity<String>("you are not allowed for this action", HttpStatus.BAD_REQUEST);

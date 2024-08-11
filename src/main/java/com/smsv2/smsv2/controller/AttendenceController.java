@@ -63,7 +63,8 @@ public class AttendenceController {
 			@RequestParam("file") MultipartFile file) {
 		if (role.equals("teacher") || role.equals("hod") || role.equals("pic")) {
 
-			String message = attendenceService.uploadFile(id, file);
+			ResponseEntity<String> responseEntity = attendenceService.uploadFile(id, file);
+			String message = responseEntity.getBody(); 
 			return ResponseEntity.status(HttpStatus.OK).body(message);
 
 		} else {

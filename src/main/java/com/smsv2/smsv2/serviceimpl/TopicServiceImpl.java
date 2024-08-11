@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,26 +37,29 @@ public class TopicServiceImpl implements TopicService {
 	private SubDao subdao;
 
 	@Override
-	public List<Topic> getAllTopic() {
-		return topicdao.findAll();
+	public ResponseEntity<List<Topic>> getAllTopic() {
+	    List<Topic> topics = topicdao.findAll();
+	    return new ResponseEntity<>(topics, HttpStatus.OK);
 	}
 
+
 	@Override
-	public Optional<Topic> getAllTopicById(int id) {
+	public ResponseEntity<Optional<Topic>> getAllTopicById(int id) {
 		Optional<Topic> topic = topicdao.findById(id);
 		if (topic.isEmpty()) {
 			throw new ResourceNotFoundException("topic", "id", id);
 		}
-		return topic;
+		return new ResponseEntity<>(topic, HttpStatus.OK);
 	}
 
 	@Override
-	public List<Topic> getAllTopicBySubId(int subId) {
-		return topicdao.findBySubId(subId);
+	public ResponseEntity<List<Topic>> getAllTopicBySubId(int subId) {
+		List<Topic> topics =  topicdao.findBySubId(subId);
+		return new ResponseEntity<>(topics, HttpStatus.OK);
 	}
 
 	@Override
-	public void addTopic(TopicDTO topicDTO) {
+	public ResponseEntity<?> addTopic(TopicDTO topicDTO) {
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
 		Sub sub = subdao.findById(topicDTO.getSubId())
@@ -68,13 +73,14 @@ public class TopicServiceImpl implements TopicService {
 			topic.setSemname(sub.getSemname());
 			topic.setSubname(sub.getSubname());
 			topicdao.save(topic);
+			return new ResponseEntity<>(topic,HttpStatus.CREATED);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
 	}
 
 	@Override
-	public void updateTopic(int id, TopicDTO topicDTO) {
+	public ResponseEntity<?> updateTopic(int id, TopicDTO topicDTO) {
 		Topic existTopic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
@@ -83,7 +89,7 @@ public class TopicServiceImpl implements TopicService {
 			existTopic.setName(topicDTO.getName());
 			existTopic.setLink(topicDTO.getLink());
 			topicdao.save(existTopic);
-
+			return new ResponseEntity<>(existTopic,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -91,13 +97,14 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	@Override
-	public void delteTopicById(int id, TopicDTO topicDTO) {
+	public ResponseEntity<?> delteTopicById(int id, TopicDTO topicDTO) {
 		Topic existTopic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
 
 		if (teacher.getSub().contains(existTopic.getSub())) {
 			topicdao.delete(existTopic);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -105,7 +112,7 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	@Override
-	public void delteTopicBySubId(int subId, TopicDTO topicDTO) {
+	public ResponseEntity<?> delteTopicBySubId(int subId, TopicDTO topicDTO) {
 		List<Topic> existTopic = topicdao.findBySubId(subId);
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
@@ -113,6 +120,7 @@ public class TopicServiceImpl implements TopicService {
 				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", topicDTO.getSubId()));
 		if (teacher.getSub().contains(sub)) {
 			topicdao.deleteAll(existTopic);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allowed");
 		}
@@ -120,11 +128,12 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	@Override
-	public void deleteAllTopic(TopicDTO topicDTO) {
+	public ResponseEntity<?> deleteAllTopic(TopicDTO topicDTO) {
 		Teacher teacher = teacherdao.findById(topicDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", topicDTO.getTeacherId()));
 		if (teacher.getRole().equals("pic")) {
 			topicdao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not pic");
 		}
@@ -132,12 +141,13 @@ public class TopicServiceImpl implements TopicService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Topic topic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
 			topic.setPdf(file.getBytes());
 			topicdao.save(topic);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}
@@ -147,5 +157,6 @@ public class TopicServiceImpl implements TopicService {
 	public byte[] downloadFile(int id) {
 		Topic topic = topicdao.findById(id).orElseThrow(() -> new ResourceNotFoundException("topic", "id", id));
 		return topic.getPdf();
+	
 	}
 }

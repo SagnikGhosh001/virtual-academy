@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,21 +36,22 @@ public class AssignmentServiceImpl implements AssignmentService {
 	private TeacherDao teacherdao;
 
 	@Override
-	public List<Assignment> getAllAssignment() {
-		return assignmentdao.findAll();
+	public ResponseEntity<List<Assignment>> getAllAssignment() {
+		List<Assignment> assignment= assignmentdao.findAll();
+		return new ResponseEntity<>(assignment,HttpStatus.OK);
 	}
 
 	@Override
-	public Optional<Assignment> getAllAssignmentById(int id) {
+	public ResponseEntity<Optional<Assignment>> getAllAssignmentById(int id) {
 		Optional<Assignment> assignment = assignmentdao.findById(id);
 		if (assignment.isEmpty()) {
 			throw new ResourceNotFoundException("assignment", "id", id);
 		}
-		return assignment;
+		return new ResponseEntity<>(assignment,HttpStatus.OK);
 	}
 
 	@Override
-	public void addAssignment(AssignmentDTO assignmentDTO) {
+	public ResponseEntity<?> addAssignment(AssignmentDTO assignmentDTO) {
 
 		Sub sub = subdao.findById(assignmentDTO.getSubId())
 				.orElseThrow(() -> new ResourceNotFoundException("sub", "id", assignmentDTO.getSubId()));
@@ -66,6 +69,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 			assignment.setDeadline(assignmentDTO.getDeadline());
 			assignment.setDescription(assignmentDTO.getDescription());
 			assignmentdao.save(assignment);
+			return new ResponseEntity<>(assignment,HttpStatus.CREATED);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed for this action");
 		}
@@ -73,7 +77,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 	}
 
 	@Override
-	public void updateAssignment(int id, AssignmentDTO assignmentDTO) {
+	public ResponseEntity<?> updateAssignment(int id, AssignmentDTO assignmentDTO) {
 		Assignment existassignment = assignmentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
 		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
@@ -83,6 +87,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 			existassignment.setDescription(assignmentDTO.getDescription());
 			existassignment.setDeadline(assignmentDTO.getDeadline());
 			assignmentdao.save(existassignment);
+			return new ResponseEntity<>(existassignment,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed for this action");
 
@@ -91,13 +96,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 	}
 
 	@Override
-	public void delteAssignmentById(int id, AssignmentDTO assignmentDTO) {
+	public ResponseEntity<?> delteAssignmentById(int id, AssignmentDTO assignmentDTO) {
 		Assignment existassignment = assignmentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
 		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
 		if (existassignment.getTeacherId().getId() == assignmentDTO.getTeacherId()) {
 			assignmentdao.delete(existassignment);
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("you are not allwed for this action");
 
@@ -106,11 +112,12 @@ public class AssignmentServiceImpl implements AssignmentService {
 	}
 
 	@Override
-	public void deleteAllAssignment(AssignmentDTO assignmentDTO) {
+	public ResponseEntity<?> deleteAllAssignment(AssignmentDTO assignmentDTO) {
 		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
 		if (teacher.getRole().equals("pic")) {
 			assignmentdao.deleteAll();
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic ");
 		}
@@ -118,13 +125,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 	}
 
 	@Override
-	public List<Assignment> getAllAssignmentBySubId(int subId) {
-		return assignmentdao.findBySubId(subId);
+	public ResponseEntity<List<Assignment>> getAllAssignmentBySubId(int subId) {
+		List<Assignment> assignment= assignmentdao.findBySubId(subId);
+		return new ResponseEntity<>(assignment,HttpStatus.OK);
 
 	}
 
 	@Override
-	public void deleteAllAssignmentBySub(int subid,AssignmentDTO assignmentDTO) {
+	public ResponseEntity<?> deleteAllAssignmentBySub(int subid,AssignmentDTO assignmentDTO) {
 		Teacher teacher = teacherdao.findById(assignmentDTO.getTeacherId())
 				.orElseThrow(() -> new ResourceNotFoundException("teacher", "id", assignmentDTO.getTeacherId()));
 		Sub sub = subdao.findById(subid)
@@ -133,6 +141,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 			List<Assignment> assignment = assignmentdao.findBySubId(subid);
 			if (!assignment.isEmpty()) {
 				assignmentdao.deleteAll(assignment);
+				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
 				throw new ResourceBadRequestException("no assignment for this subject");
 
@@ -145,13 +154,14 @@ public class AssignmentServiceImpl implements AssignmentService {
 	}
 
 	@Override
-	public String uploadFile(int id, MultipartFile file) {
+	public ResponseEntity<String> uploadFile(int id, MultipartFile file) {
 		try {
 			Assignment assignment = assignmentdao.findById(id)
 					.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
 			assignment.setPdf(file.getBytes()); // Assuming 'pdf' field can hold PDF bytes
 			assignmentdao.save(assignment);
-			return "File uploaded successfully";
+			String msg= "File uploaded successfully";
+			return new ResponseEntity<>(msg,HttpStatus.OK);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload file", e);
 		}
@@ -162,6 +172,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 		Assignment assignment = assignmentdao.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("assignment", "id", id));
 		return assignment.getPdf();
+		
 	}
 
 }

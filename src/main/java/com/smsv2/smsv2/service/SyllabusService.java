@@ -3,30 +3,32 @@ package com.smsv2.smsv2.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.smsv2.smsv2.DTO.SyllabusDTO;
 import com.smsv2.smsv2.entity.Syllabus;
+import com.twilio.http.Response;
 
 public interface SyllabusService {
-	List<Syllabus> getAllSyllabus();
+	ResponseEntity<List<Syllabus>> getAllSyllabus();
 
-	Optional<Syllabus> getSyllabusById(int id);
+	ResponseEntity<Optional<Syllabus>> getSyllabusById(int id);
 
-	List<Syllabus> getSyllabusByDeptId(int deptId);
+	ResponseEntity<List<Syllabus>> getSyllabusByDeptId(int deptId);
 
-	String uploadFile(int id, MultipartFile file);
+	ResponseEntity<String> uploadFile(int id, MultipartFile file);
 
 	byte[] downloadFile(int id);
 
-	void addSyllabus(SyllabusDTO syllabusDTO);
+	ResponseEntity<?> addSyllabus(SyllabusDTO syllabusDTO);
 
-	void updateSyllabus(int id, SyllabusDTO syllabusDTO);
+	ResponseEntity<?> updateSyllabus(int id, SyllabusDTO syllabusDTO);
 
 
-	void deleteSyllabusById(int id, SyllabusDTO syllabusDTO);
+	ResponseEntity<?> deleteSyllabusById(int id, SyllabusDTO syllabusDTO);
 
-	void deleteSyllabusByDeptId(int deptid, SyllabusDTO syllabusDTO);
+	ResponseEntity<?> deleteSyllabusByDeptId(int deptid, SyllabusDTO syllabusDTO);
 
-	void deleteAllSyllabus(SyllabusDTO syllabusDTO);
+	ResponseEntity<?> deleteAllSyllabus(SyllabusDTO syllabusDTO);
 }

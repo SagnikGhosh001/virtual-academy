@@ -67,7 +67,8 @@ public class TeacherController {
 
 	@PostMapping("/uploadteacherpic/{teacherId}")
 	public ResponseEntity<String> uploadFile(@PathVariable int teacherId, @RequestParam("file") MultipartFile file) {
-		String message = teacherservice.uploadFile(teacherId, file);
+		ResponseEntity<String> responseEntity = teacherservice.uploadFile(teacherId, file);
+		String message = responseEntity.getBody();
 		return ResponseEntity.status(HttpStatus.OK).body(message);
 	}
 
