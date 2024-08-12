@@ -18,9 +18,9 @@ public interface AdminService {
 
 	ResponseEntity<?> updateAdmin(int id,AdminDTO adminDTO);
 
-	ResponseEntity<?> uploadFile(int studentId, MultipartFile file);
+	ResponseEntity<String> uploadFile(int studentId, MultipartFile file);
 
-	ResponseEntity<byte[]> downloadFile(int studentId);
+	byte[] downloadFile(int studentId);
 
 	ResponseEntity<?> delteAdminById(int id,AdminDTO adminDTO);
 }

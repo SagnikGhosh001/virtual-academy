@@ -182,11 +182,25 @@ public class TeacherServiceImpl implements TeacherService {
 				|| (admin.isPresent() && admin.get().getRole().equals("admin"))) {
 			existTeacher.setDept(dept);
 			existTeacher.setDeptname(dept.getDeptname());
-			existTeacher.setRole(teacherDTO.getRole());
+			if(teacherDTO.getRole().equals("pic")) {
+				Teacher roleteacher=teacherdao.findByRole("pic");
+				if(roleteacher!=null) {
+					roleteacher.setRole("teacher");
+					existTeacher.setRole("pic");
+					teacherdao.save(roleteacher);
+				}else {
+					existTeacher.setRole("pic");
+					teacherdao.save(roleteacher);
+				}		
+			}else {
+				existTeacher.setRole(teacherDTO.getRole());
+			}
+			
 			if (!existTeacher.getSem().contains(sem)) {
 				existTeacher.getSem().add(sem);
 			}
 			teacherdao.save(existTeacher);
+			
 			 return new ResponseEntity<>(existTeacher,HttpStatus.OK);
 		} else {
 			throw new ResourceBadRequestException("your role should be pic or admin");

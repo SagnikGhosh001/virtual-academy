@@ -121,10 +121,10 @@ public class AdminServiceImpl implements AdminService {
 	}
 
 	@Override
-	public ResponseEntity<byte[]> downloadFile(int id) {
+	public byte[] downloadFile(int id) {
 		Admin admin = admindao.findById(id).orElseThrow(() -> new ResourceNotFoundException("admin", "id", id));
-		byte[] pic= admin.getPic();
-		return new ResponseEntity<>(pic,HttpStatus.OK);
+		return admin.getPic();
+		
 	}
 
 	@Override

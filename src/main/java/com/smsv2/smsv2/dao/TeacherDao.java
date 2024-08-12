@@ -14,6 +14,7 @@ Optional<Teacher> findByEmail(String email);
 Optional<Teacher> findByPhone(String phone);
 List<Teacher> findBySemId(int id);
 List<Teacher> findByDeptId(int id);
+Teacher findByRole(String role);
 
 @Query("SELECT t FROM Teacher t JOIN t.sem s WHERE s.id = ?1 AND t.dept.id = ?2")
 List<Teacher> findBySemDeptId(int sem,int dept);
